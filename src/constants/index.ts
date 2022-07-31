@@ -140,9 +140,27 @@ type ChainTokenList = {
   readonly [chainId in ChainId]: Token[]
 }
 
-export const DAI = new Token(ChainId.HARMONY_MAINNET, '0x88f9deaea3da49b33453640a5567906fbc609cc8', 18, 'DAI', 'Dai Stablecoin')
-export const USDC = new Token(ChainId.HARMONY_MAINNET, '0x750ba8b76187092b0d1e87e28daaf484d1b5273b', 6, 'USDC', 'USD//C')
-export const USDT = new Token(ChainId.HARMONY_MAINNET, '0x52484e1ab2e2b22420a25c20fa49e173a26202cd', 6, 'USDT', 'Tether USD')
+export const DAI = new Token(
+  ChainId.HARMONY_MAINNET,
+  '0x88f9deaea3da49b33453640a5567906fbc609cc8',
+  18,
+  'DAI',
+  'Dai Stablecoin'
+)
+export const USDC = new Token(
+  ChainId.HARMONY_MAINNET,
+  '0x750ba8b76187092b0d1e87e28daaf484d1b5273b',
+  6,
+  'USDC',
+  'USD//C'
+)
+export const USDT = new Token(
+  ChainId.HARMONY_MAINNET,
+  '0x52484e1ab2e2b22420a25c20fa49e173a26202cd',
+  6,
+  'USDT',
+  'Tether USD'
+)
 export const COMP = new Token(ChainId.MAINNET, '0xc00e94Cb662C3520282E6f5717214004A7f26888', 18, 'COMP', 'Compound')
 export const MKR = new Token(ChainId.MAINNET, '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2', 18, 'MKR', 'Maker')
 export const AMPL = new Token(ChainId.MAINNET, '0xD46bA6D942050d489DBd938a2C909A5d5039A161', 9, 'AMPL', 'Ampleforth')

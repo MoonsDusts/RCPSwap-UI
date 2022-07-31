@@ -17,7 +17,8 @@ const CMC_ALL_LIST = 'defi.cmc.eth'
 const CMC_STABLECOIN = 'stablecoin.cmc.eth'
 const KLEROS_LIST = 't2crtokens.eth'
 const GEMINI_LIST = 'https://www.gemini.com/uniswap/manifest.json'*/
-const VENOMSWAP_DEFAULT_LIST = 'https://raw.githubusercontent.com/MoonsDusts/rcpswap-tokenlists/main/rcpswap.tokenlist.json'
+const VENOMSWAP_DEFAULT_LIST =
+  'https://raw.githubusercontent.com/MoonsDusts/rcpswap-tokenlists/main/rcpswap.tokenlist.json'
 const VENOMSWAP_COMMUNITY_LIST = ''
 
 // lower index == higher priority for token import

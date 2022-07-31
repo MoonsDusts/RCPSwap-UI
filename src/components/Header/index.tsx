@@ -13,7 +13,7 @@ import CobraLogo from '../../assets/svg/cobraswap/black.svg'
 import CobraLogoDark from '../../assets/svg/cobraswap/white.svg'
 import { useActiveWeb3React } from '../../hooks'
 import { useDarkModeManager } from '../../state/user/hooks'
-import { useETHBalances, /*useAggregateGovTokenBalance*/ } from '../../state/wallet/hooks'
+import { useETHBalances /*useAggregateGovTokenBalance*/ } from '../../state/wallet/hooks'
 import { CardNoise } from '../earn/styled'
 // import { CountUp } from 'use-count-up'
 import { TYPE } from '../../theme'
@@ -373,7 +373,9 @@ export default function Header() {
           >
             {t('pool')}
           </StyledNavLink>
-          <StyledNavLink id={`#`} to={'#'} onClick={() => window.open("https://bridge.arbitrum.io")}>Bridge</StyledNavLink>
+          <StyledNavLink id={`#`} to={'#'} onClick={() => window.open('https://bridge.arbitrum.io')}>
+            Bridge
+          </StyledNavLink>
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
@@ -426,8 +428,8 @@ export default function Header() {
           <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
             {account && userEthBalance ? (
               <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
-              {userEthBalance?.toSignificant(4)} {BASE_CURRENCY.symbol}
-            </BalanceText>
+                {userEthBalance?.toSignificant(4)} {BASE_CURRENCY.symbol}
+              </BalanceText>
             ) : null}
             <Web3Status />
           </AccountElement>

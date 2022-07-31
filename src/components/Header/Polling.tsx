@@ -86,7 +86,9 @@ export default function Polling() {
   return (
     <ExternalLink href={chainId && blockNumber ? getEtherscanLink(chainId, blockNumber.toString(), 'block') : ''}>
       <StyledPolling>
-        <TYPE.mediumHeader style={{ opacity: isMounted ? '0.5' : '0.8', fontSize: '16px' }}>{blockNumber}</TYPE.mediumHeader>
+        <TYPE.mediumHeader style={{ opacity: isMounted ? '0.5' : '0.8', fontSize: '16px' }}>
+          {blockNumber}
+        </TYPE.mediumHeader>
         <StyledPollingDot>{!isMounted && <Spinner />}</StyledPollingDot>
       </StyledPolling>
     </ExternalLink>
