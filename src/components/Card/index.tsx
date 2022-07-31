@@ -52,7 +52,7 @@ const BlueCardStyled = styled(Card)`
 export const BlueCard = ({ children, ...rest }: CardProps) => {
   return (
     <BlueCardStyled {...rest}>
-      <Text fontWeight={500} color="#FD4040">
+      <Text fontWeight={500} color="#c23616">
         {children}
       </Text>
     </BlueCardStyled>

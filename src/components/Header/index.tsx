@@ -373,7 +373,7 @@ export default function Header() {
           >
             {t('pool')}
           </StyledNavLink>
-          <StyledNavLink id={`#`} to={'#'} onClick={() => window.open('https://bridge.arbitrum.io')}>
+          <StyledNavLink style={{ color: '#C3C5CB', fontWeight: 500 }} id={`#`} to={'#'} onClick={() => window.open('https://bridge.arbitrum.io')}>
             Bridge
           </StyledNavLink>
         </HeaderLinks>
