@@ -147,13 +147,7 @@ export const DAI = new Token(
   'DAI',
   'Dai Stablecoin'
 )
-export const USDC = new Token(
-  ChainId.NOVA_MAINNET,
-  '0x750ba8b76187092b0d1e87e28daaf484d1b5273b',
-  6,
-  'USDC',
-  'USD//C'
-)
+export const USDC = new Token(ChainId.NOVA_MAINNET, '0x750ba8b76187092b0d1e87e28daaf484d1b5273b', 6, 'USDC', 'USD//C')
 export const USDT = new Token(
   ChainId.NOVA_MAINNET,
   '0x52484e1ab2e2b22420a25c20fa49e173a26202cd',
