@@ -96,7 +96,7 @@ export default function ModifiedStakingModal({ isOpen, onDismiss, stakingInfo }:
   const { lastActionBlock, withdrawalFee } = useCalculateWithdrawalFee(stakingInfo.pid, account)
 
   let feeInfoUrl = ''
-  if (blockchain == Blockchain.HARMONY) {
+  if (blockchain == Blockchain.ARBITRUM_NOVA) {
     feeInfoUrl = 'https://docs.venomdao.org/viper/fees'
   }
 

@@ -316,7 +316,7 @@ export default function Header() {
       logoDark = CobraLogoDark
       logo = CobraLogo
       break
-    case Blockchain.HARMONY:
+    case Blockchain.ARBITRUM_NOVA:
       logoDark = ViperLogoDark
       logo = ViperLogo
       break

@@ -6,7 +6,7 @@ export default function usePlatformName(): string {
   switch (blockchain) {
     case Blockchain.BINANCE_SMART_CHAIN:
       return 'RCPSwap | Reddit Community Points Swap'
-    case Blockchain.HARMONY:
+    case Blockchain.ARBITRUM_NOVA:
       return 'RCPSwap | Reddit Community Points Swap'
     case Blockchain.ETHEREUM:
       return 'RCPSwap | Reddit Community Points Swap'

@@ -1,4 +1,4 @@
-import { ChainId, Currency, ETHER, HARMONY, BINANCE_COIN, WETH } from '@venomswap/sdk'
+import { ChainId, Currency, ETHER, BINANCE_COIN, WETH, ARBITRUM_NOVA } from '@venomswap/sdk'
 import { NETWORK_CHAIN_ID } from '../connectors'
 
 export default function baseCurrencies(chainId: ChainId | undefined): Currency[] {
@@ -15,7 +15,7 @@ export default function baseCurrencies(chainId: ChainId | undefined): Currency[]
         currencies.push(ETHER)
         break
       case 1666700000:
-        currencies.push(HARMONY)
+        currencies.push(ARBITRUM_NOVA)
         currencies.push(WETH[chainId])
         break
       default:

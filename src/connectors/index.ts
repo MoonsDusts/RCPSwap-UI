@@ -42,7 +42,7 @@ switch (BLOCKCHAIN) {
   case Blockchain.BINANCE_SMART_CHAIN:
     supportedChainIds = [56, 97]
     break
-  case Blockchain.HARMONY:
+  case Blockchain.ARBITRUM_NOVA:
     supportedChainIds = [42170, 1666700000]
     break
   default:

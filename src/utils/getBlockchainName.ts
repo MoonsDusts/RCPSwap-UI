@@ -11,8 +11,8 @@ export default function getBlockchainName(chainId: ChainId | undefined): string 
     case ChainId.BSC_MAINNET:
     case ChainId.BSC_TESTNET:
       return 'Binance Smart Chain'
-    case ChainId.HARMONY_MAINNET:
-    case ChainId.HARMONY_TESTNET:
+    case ChainId.NOVA_MAINNET:
+    case ChainId.NOVA_TESTNET:
       return 'Arbitrum Nova'
     default:
       return 'Ethereum'

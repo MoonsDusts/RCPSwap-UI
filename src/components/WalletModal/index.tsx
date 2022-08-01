@@ -369,7 +369,7 @@ export default function WalletModal({
                   <ExternalLink href="https://ethereum.org/wallets/">Learn more about Nova</ExternalLink>
                 </>
               )}
-              {blockchain === Blockchain.HARMONY && (
+              {blockchain === Blockchain.ARBITRUM_NOVA && (
                 <>
                   <span>New? &nbsp;</span>{' '}
                   <ExternalLink href="https://medium.com/offchainlabs/introducing-nova-arbitrum-anytrust-mainnet-is-open-for-developers-9a54692f345e">

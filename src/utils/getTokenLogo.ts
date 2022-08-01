@@ -7,7 +7,7 @@ export default function getTokenLogo(): string {
   switch (BLOCKCHAIN) {
     case Blockchain.BINANCE_SMART_CHAIN:
       return cobraTokenLogo
-    case Blockchain.HARMONY:
+    case Blockchain.ARBITRUM_NOVA:
       return viperTokenLogo
     default:
       return viperTokenLogo
