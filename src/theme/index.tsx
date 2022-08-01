@@ -90,10 +90,10 @@ export function defaultColors(darkMode: boolean): Colors {
     // blue5: darkMode ? '#153d6f70' : '#EBF4FF',
 
     // Added:
-    tokenButtonGradientStart: '#590000',
+    tokenButtonGradientStart: '#52f7ea',
     tokenButtonGradientEnd: '#005224',
-    customCardGradientStart: '#590000',
-    customCardGradientEnd: '#a31717'
+    customCardGradientStart: '#52f7ea',
+    customCardGradientEnd: '#30D5C8'
   }
 }
 
@@ -122,14 +122,14 @@ export function viperColors(darkMode: boolean): Colors {
     advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.6)',
 
     //primary colors
-    primary1: darkMode ? '#669999' : '#a31717',
+    primary1: darkMode ? '#669999' : '#30D5C8',
     primary2: darkMode ? '#3680E7' : '#FF8CC3',
     primary3: darkMode ? '#4D8FEA' : '#FF99C9',
     primary4: darkMode ? '#376bad70' : '#F6DDE8',
     primary5: darkMode ? '#153d6f70' : '#e8f4e5',
 
     // color text
-    primaryText1: darkMode ? '#669999' : '#a31717',
+    primaryText1: darkMode ? '#669999' : '#30D5C8',
 
     // secondary colors
     secondary1: darkMode ? '#2172E5' : '#ff007a',
@@ -150,10 +150,10 @@ export function viperColors(darkMode: boolean): Colors {
     // blue5: darkMode ? '#153d6f70' : '#EBF4FF',
 
     // Added:
-    tokenButtonGradientStart: '#590000',
+    tokenButtonGradientStart: '#52f7ea',
     tokenButtonGradientEnd: '#005224',
-    customCardGradientStart: '#590000',
-    customCardGradientEnd: '#a31717'
+    customCardGradientStart: '#52f7ea',
+    customCardGradientEnd: '#30D5C8'
   }
 }
 
@@ -270,10 +270,10 @@ export function harmonyColors(darkMode: boolean): Colors {
     // blue5: darkMode ? '#153d6f70' : '#EBF4FF',
 
     // Added:
-    tokenButtonGradientStart: '#590000',
+    tokenButtonGradientStart: '#52f7ea',
     tokenButtonGradientEnd: '#005224',
-    customCardGradientStart: '#590000',
-    customCardGradientEnd: '#a31717'
+    customCardGradientStart: '#52f7ea',
+    customCardGradientEnd: '#30D5C8'
   }
 }
 
