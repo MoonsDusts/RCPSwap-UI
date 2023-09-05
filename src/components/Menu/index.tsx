@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Send, Code, Twitter, Calendar } from 'react-feather'
+import { FaReddit, FaTelegramPlane, FaBook, FaGithub, FaTwitter, FaRegChartBar } from 'react-icons/fa'
 import styled from 'styled-components'
 import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg'
 import { useOnClickOutside } from '../../hooks/useOnClickOutside'
@@ -101,24 +101,28 @@ export default function Menu() {
       {open && (
         <MenuFlyout>
           <MenuItem id="link" href="https://t.me/RedditMoon">
-            <Send size={14} />
+            <FaTelegramPlane size={16} />
             Telegram
           </MenuItem>
           <MenuItem id="link" href={CODE_LINK}>
-            <Code size={14} />
+            <FaReddit size={16} />
             Reddit
           </MenuItem>
+          <MenuItem id="link" href="https://github.com/MoonsDusts">
+            <FaGithub size={16} />
+            GitHub
+          </MenuItem>
           <MenuItem id="link" href="https://twitter.com/moonsswap">
-            <Twitter size={14} />
+            <FaTwitter size={16} />
             Twitter
           </MenuItem>
-          <MenuItem id="link" href="https://twitter.com/moonsswap">
-            <Calendar size={14} />
-            Analytics
-          </MenuItem>
-          <MenuItem id="link" href="https://twitter.com/moonsswap">
-            <Calendar size={14} />
+          <MenuItem id="link" href="https://moonsdust.gitbook.io/rcpswap/">
+            <FaBook size={16} />
             Docs
+          </MenuItem>
+          <MenuItem id="link" href="https://www.geckoterminal.com/arbitrum_nova/rcpswap/pools">
+            <FaRegChartBar size={16} />
+            Analytics
           </MenuItem>
         </MenuFlyout>
       )}

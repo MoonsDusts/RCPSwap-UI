@@ -18,7 +18,10 @@ export default function getTokenWithDefault(chainId: ChainId, symbol: string): T
       break
   }
 
-  if ((!token || token.address === ZERO_ONE_ADDRESS) && [ChainId.NOVA_TESTNET, ChainId.BSC_TESTNET].includes(chainId)) {
+  if (
+    (!token || token.address === ZERO_ONE_ADDRESS) &&
+    [ChainId.HARMONY_TESTNET, ChainId.BSC_TESTNET].includes(chainId)
+  ) {
     const govToken = GOVERNANCE_TOKEN[chainId]
     if (symbol.toUpperCase() === govToken.symbol?.toUpperCase()) {
       token = govToken

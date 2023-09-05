@@ -15,19 +15,19 @@ export default function useTokensWithWethPrices(): Record<string, any> {
   const govToken = useGovernanceToken()
   const govTokenWETHPrice = useTokenWethPrice(govToken)
 
-  const BUSDTicker = chainId !== ChainId.NOVA_TESTNET ? 'BUSD' : '1BUSD'
+  const BUSDTicker = chainId !== ChainId.HARMONY_TESTNET ? 'BUSD' : '1BUSD'
   const BUSD: Token | undefined = getToken(chainId, BUSDTicker)
   const BUSDWETHPrice = useTokenWethPrice(BUSD)
 
-  const USDCTicker = blockchain === Blockchain.ARBITRUM_NOVA ? '1USDC' : 'USDC'
+  const USDCTicker = blockchain === Blockchain.HARMONY ? '1USDC' : 'USDC'
   const USDC: Token | undefined = getToken(chainId, USDCTicker)
   const USDCWETHPrice = useTokenWethPrice(USDC)
 
-  // NOVA specific tokens
-  const bscBUSD: Token | undefined = blockchain === Blockchain.ARBITRUM_NOVA ? getToken(chainId, 'bscBUSD') : undefined
+  // Harmony specific tokens
+  const bscBUSD: Token | undefined = blockchain === Blockchain.HARMONY ? getToken(chainId, 'bscBUSD') : undefined
   const bscBUSDWETHPrice = useTokenWethPrice(bscBUSD)
 
-  const bridgedETH: Token | undefined = Blockchain.ARBITRUM_NOVA ? getToken(chainId, '1ETH') : undefined
+  const bridgedETH: Token | undefined = Blockchain.HARMONY ? getToken(chainId, '1ETH') : undefined
   const bridgedETHWETHPrice = useTokenWethPrice(bridgedETH)
 
   return useMemo(() => {

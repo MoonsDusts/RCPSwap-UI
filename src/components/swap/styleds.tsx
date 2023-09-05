@@ -37,9 +37,9 @@ export const BottomGrouping = styled.div`
 export const ErrorText = styled(Text)<{ severity?: 0 | 1 | 2 | 3 | 4 }>`
   color: ${({ theme, severity }) =>
     severity === 3 || severity === 4
-      ? theme.red1
+      ? '#e61537' //Red color impact
       : severity === 2
-      ? theme.yellow2
+      ? '#f7c40c' //Orange color impact
       : severity === 1
       ? theme.text1
       : theme.green1};

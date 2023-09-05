@@ -1,8 +1,10 @@
 import { BLOCKED_PRICE_IMPACT_NON_EXPERT } from '../constants'
-import { CurrencyAmount, Fraction, JSBI, Percent, TokenAmount, Trade, Currency } from '@venomswap/sdk'
+import { CurrencyAmount, Fraction, JSBI, Percent, TokenAmount, Trade, Currency, Price } from '@venomswap/sdk'
 import { ALLOWED_PRICE_IMPACT_HIGH, ALLOWED_PRICE_IMPACT_LOW, ALLOWED_PRICE_IMPACT_MEDIUM } from '../constants'
 import { Field } from '../state/swap/actions'
 import { basisPointsToPercent } from './index'
+import { XFusionSwapType } from 'state/swap/hooks'
+import { ethers } from 'ethers'
 
 const BASE_FEE = new Percent(JSBI.BigInt(30), JSBI.BigInt(10000))
 const ONE_HUNDRED_PERCENT = new Percent(JSBI.BigInt(10000), JSBI.BigInt(10000))
@@ -76,15 +78,54 @@ export function formatExecutionPrice(trade?: Trade, inverted?: boolean): string 
 }
 
 export function formatBlockchainAdjustedExecutionPrice(
+  swapMode: number,
+  fusionSwap?: XFusionSwapType,
   trade?: Trade,
   tradeInputCurrency?: Currency | undefined,
   tradeOutputCurrency?: Currency | undefined,
-  inverted?: boolean
+  inverted?: boolean,
+  providerPrice?: boolean
 ): string {
-  if (!trade || !tradeInputCurrency || !tradeOutputCurrency) {
+  if ((swapMode === 0 && !trade) || !tradeInputCurrency || !tradeOutputCurrency) {
     return ''
   }
-  return inverted
-    ? `${trade.executionPrice.invert().toSignificant(6)} ${tradeInputCurrency.symbol} / ${tradeOutputCurrency.symbol}`
-    : `${trade.executionPrice.toSignificant(6)} ${tradeOutputCurrency.symbol} / ${tradeInputCurrency.symbol}`
+  try {
+    return inverted
+      ? `${
+          swapMode === 0
+            ? trade?.executionPrice.invert().toSignificant(6)
+            : fusionSwap?.result.route && fusionSwap.parsedAmount && fusionSwap.result && fusionSwap.currencies?.OUTPUT
+            ? new Price(
+                fusionSwap.parsedAmount.currency,
+                fusionSwap.currencies?.OUTPUT,
+                fusionSwap.parsedAmount.raw,
+                ethers.BigNumber.from(
+                  providerPrice
+                    ? fusionSwap.result.route.singleProviderRoute?.amountOutBN
+                    : fusionSwap.result.route.amountOutBN ?? '0'
+                ).toString()
+              )
+                .invert()
+                .toSignificant(6)
+            : ''
+        } ${tradeInputCurrency.symbol} / ${tradeOutputCurrency.symbol}`
+      : `${
+          swapMode === 0
+            ? trade?.executionPrice.toSignificant(6)
+            : fusionSwap?.result.route && fusionSwap.parsedAmount && fusionSwap.result && fusionSwap.currencies?.OUTPUT
+            ? new Price(
+                fusionSwap.parsedAmount.currency,
+                fusionSwap.currencies?.OUTPUT,
+                fusionSwap.parsedAmount.raw,
+                ethers.BigNumber.from(
+                  providerPrice
+                    ? fusionSwap.result.route.singleProviderRoute?.amountOutBN
+                    : fusionSwap.result.route.amountOutBN ?? '0'
+                ).toString()
+              ).toSignificant(6)
+            : ''
+        } ${tradeOutputCurrency.symbol} / ${tradeInputCurrency.symbol}`
+  } catch (err) {
+    return '-'
+  }
 }

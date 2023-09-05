@@ -1,4 +1,4 @@
-import { Blockchain, Currency, ETHER, BINANCE_COIN, ARBITRUM_NOVA } from '@venomswap/sdk'
+import { Blockchain, Currency, ETHER, BINANCE_COIN, HARMONY } from '@venomswap/sdk'
 
 export default function getBlockchainAdjustedCurrency(
   blockchain: Blockchain,
@@ -9,8 +9,8 @@ export default function getBlockchainAdjustedCurrency(
   switch (blockchain) {
     case Blockchain.BINANCE_SMART_CHAIN:
       return BINANCE_COIN
-    case Blockchain.ARBITRUM_NOVA:
-      return ARBITRUM_NOVA
+    case Blockchain.HARMONY:
+      return HARMONY
     default:
       return ETHER
   }

@@ -38,10 +38,10 @@ async function fetchChunk(
     console.debug('Failed to fetch chunk inside retry', error)
     throw error
   }
-  if (resultsBlockNumber.toNumber() < minBlockNumber) {
-    console.debug(`Fetched results for old block number: ${resultsBlockNumber.toString()} vs. ${minBlockNumber}`)
-    throw new RetryableError('Fetched for old block number')
-  }
+  // if (resultsBlockNumber.toNumber() < minBlockNumber) {
+  //   console.debug(`Fetched results for old block number: ${resultsBlockNumber.toString()} vs. ${minBlockNumber}`)
+  //   throw new RetryableError('Fetched for old block number')
+  // }
   return { results: returnData, blockNumber: resultsBlockNumber.toNumber() }
 }
 
@@ -90,7 +90,7 @@ export function outdatedListeningKeys(
 ): string[] {
   if (!chainId || !latestBlockNumber) return []
   const results = callResults[chainId]
-  console.log(chainId)
+
   // no results at all, load everything
   if (!results) return Object.keys(listeningKeys)
 
@@ -100,7 +100,6 @@ export function outdatedListeningKeys(
     const data = callResults[chainId][callKey]
     // no data, must fetch
     if (!data) return true
-    console.log(data.blockNumber)
 
     const minDataBlockNumber = latestBlockNumber - (blocksPerFetch - 1)
 

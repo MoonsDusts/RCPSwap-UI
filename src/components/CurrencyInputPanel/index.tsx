@@ -79,10 +79,10 @@ const InputPanel = styled.div<{ hideInput?: boolean }>`
   z-index: 1;
 `
 
-const Container = styled.div<{ hideInput: boolean }>`
+const Container = styled.div<{ hideInput: boolean; disabled?: boolean }>`
   border-radius: ${({ hideInput }) => (hideInput ? '8px' : '20px')};
   border: 1px solid ${({ theme }) => theme.bg2};
-  background-color: ${({ theme }) => theme.bg1};
+  background-color: ${({ theme, disabled }) => (disabled ? theme.bg2 : theme.bg1)};
 `
 
 const StyledTokenName = styled.span<{ active?: boolean }>`
@@ -132,6 +132,7 @@ interface CurrencyInputPanelProps {
   showCommonBases?: boolean
   customBalanceText?: string
   overrideSelectedCurrencyBalance?: CurrencyAmount | null
+  disabled?: boolean
 }
 
 export default function CurrencyInputPanel({
@@ -150,7 +151,8 @@ export default function CurrencyInputPanel({
   id,
   showCommonBases,
   customBalanceText,
-  overrideSelectedCurrencyBalance = null
+  overrideSelectedCurrencyBalance = null,
+  disabled = false
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
 
@@ -168,7 +170,7 @@ export default function CurrencyInputPanel({
 
   return (
     <InputPanel id={id}>
-      <Container hideInput={hideInput}>
+      <Container hideInput={hideInput} disabled={disabled}>
         {!hideInput && (
           <LabelRow>
             <RowBetween>
@@ -200,6 +202,7 @@ export default function CurrencyInputPanel({
                 onUserInput={val => {
                   onUserInput(val)
                 }}
+                disabled={disabled}
               />
               {account && currency && showMaxButton && label !== 'To' && (
                 <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>

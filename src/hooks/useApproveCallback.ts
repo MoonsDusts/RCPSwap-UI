@@ -12,6 +12,8 @@ import { useTokenContract } from './useContract'
 import { useActiveWeb3React } from './index'
 import { Version } from './useToggledVersion'
 import { useRouterContractAddress } from '../utils'
+import { FUSION_CONTRACT } from 'contracts'
+import { XFusionSwapType } from 'state/swap/hooks'
 
 export enum ApprovalState {
   UNKNOWN,
@@ -73,7 +75,7 @@ export function useApproveCallback(
       return
     }
 
-    let useExact = false
+    let useExact = true
     const estimatedGas = await tokenContract.estimateGas.approve(spender, MaxUint256).catch(() => {
       // general fallback for tokens who restrict approval amounts
       useExact = true
@@ -109,4 +111,8 @@ export function useApproveCallbackFromTrade(trade?: Trade, allowedSlippage = 0) 
   const v1ExchangeAddress = useV1TradeExchangeAddress(trade)
   const v2RouterAddress = useRouterContractAddress()
   return useApproveCallback(amountToApprove, tradeIsV1 ? v1ExchangeAddress : v2RouterAddress)
+}
+
+export function useFusionApproveCallback(fusionSwap: XFusionSwapType) {
+  return useApproveCallback(fusionSwap.parsedAmount, FUSION_CONTRACT.address)
 }

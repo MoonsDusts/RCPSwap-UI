@@ -1,7 +1,18 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
+import {
+  Field,
+  replaceSwapState,
+  selectCurrency,
+  setRecipient,
+  switchCurrencies,
+  switchSwapMode,
+  switchUltraMode,
+  typeInput
+} from './actions'
 
 export interface SwapState {
+  readonly swapMode: number
+  readonly isUltra: boolean
   readonly independentField: Field
   readonly typedValue: string
   readonly [Field.INPUT]: {
@@ -15,6 +26,8 @@ export interface SwapState {
 }
 
 const initialState: SwapState = {
+  swapMode: 1,
+  isUltra: false,
   independentField: Field.INPUT,
   typedValue: '',
   [Field.INPUT]: {
@@ -30,8 +43,9 @@ export default createReducer<SwapState>(initialState, builder =>
   builder
     .addCase(
       replaceSwapState,
-      (state, { payload: { typedValue, recipient, field, inputCurrencyId, outputCurrencyId } }) => {
+      (state, { payload: { isUltra, swapMode, typedValue, recipient, field, inputCurrencyId, outputCurrencyId } }) => {
         return {
+          swapMode,
           [Field.INPUT]: {
             currencyId: inputCurrencyId
           },
@@ -40,7 +54,8 @@ export default createReducer<SwapState>(initialState, builder =>
           },
           independentField: field,
           typedValue: typedValue,
-          recipient
+          recipient,
+          isUltra: isUltra
         }
       }
     )
@@ -62,12 +77,14 @@ export default createReducer<SwapState>(initialState, builder =>
         }
       }
     })
-    .addCase(switchCurrencies, state => {
+    .addCase(switchCurrencies, (state, { payload: { mode, value } }) => {
       return {
         ...state,
-        independentField: state.independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT,
+        independentField:
+          mode === 1 ? Field.INPUT : state.independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT,
         [Field.INPUT]: { currencyId: state[Field.OUTPUT].currencyId },
-        [Field.OUTPUT]: { currencyId: state[Field.INPUT].currencyId }
+        [Field.OUTPUT]: { currencyId: state[Field.INPUT].currencyId },
+        typedValue: mode === 1 ? value ?? '' : state.typedValue
       }
     })
     .addCase(typeInput, (state, { payload: { field, typedValue } }) => {
@@ -79,5 +96,17 @@ export default createReducer<SwapState>(initialState, builder =>
     })
     .addCase(setRecipient, (state, { payload: { recipient } }) => {
       state.recipient = recipient
+    })
+    .addCase(switchSwapMode, state => {
+      return {
+        ...state,
+        swapMode: 1 - state.swapMode
+      }
+    })
+    .addCase(switchUltraMode, state => {
+      return {
+        ...state,
+        isUltra: !state.isUltra
+      }
     })
 )

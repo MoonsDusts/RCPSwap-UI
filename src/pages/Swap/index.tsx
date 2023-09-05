@@ -1,6 +1,6 @@
-import { CurrencyAmount, JSBI, Token, Trade } from '@venomswap/sdk'
+import { ChainId, CurrencyAmount, Fraction, JSBI, Percent, Token, TokenAmount, Trade } from '@venomswap/sdk'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { ArrowDown } from 'react-feather'
+import { ArrowDown, Repeat } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
@@ -11,21 +11,27 @@ import Column, { AutoColumn } from '../../components/Column'
 import ConfirmSwapModal from '../../components/swap/ConfirmSwapModal'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
-import { AutoRow, RowBetween } from '../../components/Row'
+import Row, { AutoRow, RowBetween } from '../../components/Row'
 import AdvancedSwapDetailsDropdown from '../../components/swap/AdvancedSwapDetailsDropdown'
 import BetterTradeLink, { DefaultVersionLink } from '../../components/swap/BetterTradeLink'
 import confirmPriceImpactWithoutFee from '../../components/swap/confirmPriceImpactWithoutFee'
-import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../components/swap/styleds'
+import {
+  ArrowWrapper,
+  BottomGrouping,
+  StyledBalanceMaxMini,
+  SwapCallbackError,
+  Wrapper
+} from '../../components/swap/styleds'
 import TradePrice from '../../components/swap/TradePrice'
 import TokenWarningModal from '../../components/TokenWarningModal'
 import ProgressSteps from '../../components/ProgressSteps'
 import SwapHeader from '../../components/swap/SwapHeader'
 
-import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
+import { INITIAL_ALLOWED_SLIPPAGE, ROUTER_ADDRESSES } from '../../constants'
 import { getTradeVersion } from '../../data/V1'
 import { useActiveWeb3React } from '../../hooks'
 import { useCurrency, useAllTokens } from '../../hooks/Tokens'
-import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
+import { ApprovalState, useApproveCallbackFromTrade, useFusionApproveCallback } from '../../hooks/useApproveCallback'
 import useENSAddress from '../../hooks/useENSAddress'
 import { useSwapCallback } from '../../hooks/useSwapCallback'
 import useToggledVersion, { DEFAULT_VERSION, Version } from '../../hooks/useToggledVersion'
@@ -36,10 +42,11 @@ import {
   useDefaultsFromURLSearch,
   useDerivedSwapInfo,
   useSwapActionHandlers,
-  useSwapState
+  useSwapState,
+  useXFusionSwap
 } from '../../state/swap/hooks'
 import { useExpertModeManager, useUserSlippageTolerance, useUserSingleHopOnly } from '../../state/user/hooks'
-import { LinkStyledButton, TYPE } from '../../theme'
+import { LinkStyledButton, TYPE, ToggleStyledText } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import AppBody from '../AppBody'
@@ -48,10 +55,20 @@ import Loader from '../../components/Loader'
 import { useIsTransactionUnsupported } from 'hooks/Trades'
 import UnsupportedCurrencyFooter from 'components/swap/UnsupportedCurrencyFooter'
 import { isTradeBetter } from 'utils/trades'
+import FusionPrice from 'components/swap/FusionPrice'
+import { BigNumber, ethers } from 'ethers'
+import { FUSION_CONTRACT } from 'contracts'
+import AdvancedFusionDetailsDropdown from 'components/swap/AdvancedFusionDetailsDropdown'
+import { useTokenPrice } from 'hooks/useTokenPrice'
+import { calculateSlippageAmount, isAddress, shortenAddress } from 'utils'
+import TailLoader from '../../components/Loader/TailLoader'
+import Toggle from 'components/Toggle'
+import { useTransactionAdder } from 'state/transactions/hooks'
 
 export default function Swap() {
   const loadedUrlParams = useDefaultsFromURLSearch()
 
+  const { library } = useActiveWeb3React()
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
     useCurrency(loadedUrlParams?.inputCurrencyId),
@@ -86,9 +103,16 @@ export default function Swap() {
 
   // get custom setting values for user
   const [allowedSlippage] = useUserSlippageTolerance()
-
   // swap state
-  const { independentField, typedValue, recipient } = useSwapState()
+  const {
+    independentField,
+    typedValue,
+    recipient,
+    swapMode,
+    INPUT: { currencyId: inputCurrencyId },
+    OUTPUT: { currencyId: outputCurrencyId },
+    isUltra
+  } = useSwapState()
   const {
     v1Trade,
     v2Trade,
@@ -97,6 +121,11 @@ export default function Swap() {
     currencies,
     inputError: swapInputError
   } = useDerivedSwapInfo()
+
+  const fusionSwap = useXFusionSwap()
+
+  console.log(fusionSwap)
+
   const { wrapType, execute: onWrap, inputError: wrapInputError } = useWrapCallback(
     currencies[Field.INPUT],
     currencies[Field.OUTPUT],
@@ -125,12 +154,24 @@ export default function Swap() {
         [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount
       }
 
-  const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
+  const {
+    onSwitchTokens,
+    onCurrencySelection,
+    onUserInput,
+    onChangeRecipient,
+    onSwitchUltraMode
+  } = useSwapActionHandlers()
   const isValid = !swapInputError
   const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
 
   const handleTypeInput = useCallback(
     (value: string) => {
+      const index = value.indexOf('.')
+      if (index > -1 && value.length - index - 1 > (currencies[Field.INPUT]?.decimals ?? 10)) {
+        value = parseInt(value) + '.' + value.slice(index + 1, index + (currencies[Field.INPUT]?.decimals ?? 10) + 1)
+      }
+      console.log(value)
+
       onUserInput(Field.INPUT, value)
     },
     [onUserInput]
@@ -157,6 +198,8 @@ export default function Swap() {
     txHash: undefined
   })
 
+  // const { fusionSwap, loading: bestLoading } = useFusionSwap(showConfirm)
+
   const formattedAmounts = {
     [independentField]: typedValue,
     [dependentField]: showWrap
@@ -169,19 +212,28 @@ export default function Swap() {
     currencies[Field.INPUT] && currencies[Field.OUTPUT] && parsedAmounts[independentField]?.greaterThan(JSBI.BigInt(0))
   )
   const noRoute = !route
+  // const dexes = useDexList()
 
   // check whether the user has approved the router on the input token
   const [approval, approveCallback] = useApproveCallbackFromTrade(trade, allowedSlippage)
+  const [fusionApproval, fusionApproveCallback] = useFusionApproveCallback(fusionSwap)
 
   // check if user has gone through approval process, used to show two step buttons, reset on token change
   const [approvalSubmitted, setApprovalSubmitted] = useState<boolean>(false)
 
+  const tokenOutPrice = useTokenPrice(fusionSwap.currencies?.OUTPUT, swapMode === 1)
+
+  const addTransaction = useTransactionAdder()
+
   // mark when a user has submitted an approval, reset onTokenSelection for input field
   useEffect(() => {
-    if (approval === ApprovalState.PENDING) {
+    if (
+      (swapMode === 0 && approval === ApprovalState.PENDING) ||
+      (swapMode === 1 && fusionApproval === ApprovalState.PENDING)
+    ) {
       setApprovalSubmitted(true)
     }
-  }, [approval, approvalSubmitted])
+  }, [approval, approvalSubmitted, swapMode])
 
   const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
@@ -193,47 +245,135 @@ export default function Swap() {
 
   const [singleHopOnly] = useUserSingleHopOnly()
 
-  const handleSwap = useCallback(() => {
-    if (priceImpactWithoutFee && !confirmPriceImpactWithoutFee(priceImpactWithoutFee)) {
-      return
-    }
-    if (!swapCallback) {
-      return
-    }
-    setSwapState({ attemptingTxn: true, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: undefined })
-    swapCallback()
-      .then(hash => {
-        setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
+  const handleSwap = useCallback(async () => {
+    if (swapMode === 0) {
+      if (priceImpactWithoutFee && !confirmPriceImpactWithoutFee(priceImpactWithoutFee)) {
+        return
+      }
+      if (!swapCallback) {
+        return
+      }
+      setSwapState({ attemptingTxn: true, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: undefined })
+      swapCallback()
+        .then(hash => {
+          setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
 
-        ReactGA.event({
-          category: 'Swap',
-          action:
-            recipient === null
-              ? 'Swap w/o Send'
-              : (recipientAddress ?? recipient) === account
-              ? 'Swap w/o Send + recipient'
-              : 'Swap w/ Send',
-          label: [
-            trade?.inputAmount?.currency?.symbol,
-            trade?.outputAmount?.currency?.symbol,
-            getTradeVersion(trade)
-          ].join('/')
-        })
+          ReactGA.event({
+            category: 'Swap',
+            action:
+              recipient === null
+                ? 'Swap w/o Send'
+                : (recipientAddress ?? recipient) === account
+                ? 'Swap w/o Send + recipient'
+                : 'Swap w/ Send',
+            label: [
+              trade?.inputAmount?.currency?.symbol,
+              trade?.outputAmount?.currency?.symbol,
+              getTradeVersion(trade)
+            ].join('/')
+          })
 
-        ReactGA.event({
-          category: 'Routing',
-          action: singleHopOnly ? 'Swap with multihop disabled' : 'Swap with multihop enabled'
+          ReactGA.event({
+            category: 'Routing',
+            action: singleHopOnly ? 'Swap with multihop disabled' : 'Swap with multihop enabled'
+          })
         })
-      })
-      .catch(error => {
+        .catch(error => {
+          setSwapState({
+            attemptingTxn: false,
+            tradeToConfirm,
+            showConfirm,
+            swapErrorMessage: error.message,
+            txHash: undefined
+          })
+        })
+    } else {
+      try {
+        if (!fusionSwap.result || !fusionSwap.result.args) return
+        setSwapState({
+          attemptingTxn: true,
+          tradeToConfirm,
+          showConfirm,
+          swapErrorMessage: undefined,
+          txHash: undefined
+        })
+        const fusionContract = new ethers.Contract(
+          FUSION_CONTRACT.address,
+          FUSION_CONTRACT.abi,
+          library?.getSigner(account ?? undefined)
+        )
+
+        const tx = await fusionContract.processRoute(
+          fusionSwap.result.args?.tokenIn,
+          ethers.BigNumber.from(fusionSwap.result.args.amountIn ?? '0'),
+          fusionSwap.result.args.tokenOut,
+          new TokenAmount(
+            currencies.OUTPUT as Token,
+            calculateSlippageAmount(
+              new TokenAmount(
+                currencies.OUTPUT as Token,
+                BigNumber.from(fusionSwap.result.args.amountOutMin ?? '0').toString()
+              ),
+              allowedSlippage
+            )[0]
+          ).raw.toString(),
+          fusionSwap.result.route?.fee?.amountOutBN ?? '0',
+          fusionSwap.result.args.to,
+          fusionSwap.result.args.routeCode,
+          fusionSwap.result.route?.fromToken?.isNative && fusionSwap.result.args.amountIn
+            ? { value: BigNumber.from(fusionSwap.result.args.amountIn) }
+            : {}
+        )
+
+        await tx.wait()
+
+        const inputAmount = parsedAmount?.toSignificant(3)
+        const outputAmount = new TokenAmount(
+          currencies.OUTPUT as Token,
+          ethers.BigNumber.from(fusionSwap.result.route?.amountOutBN ?? '0')
+            .sub(fusionSwap.result.route?.fee?.amountOutBN ?? '0')
+            .toString()
+        ).toSignificant(3)
+
+        const base = `Swap ${inputAmount} ${currencies.INPUT?.symbol} for ${outputAmount} ${currencies.OUTPUT?.symbol}`
+        const withRecipient =
+          recipient === null || recipient === account
+            ? base
+            : `${base} to ${
+                recipientAddress && isAddress(recipientAddress) ? shortenAddress(recipientAddress) : recipientAddress
+              }`
+        const withVersion = `${withRecipient} on xFusion`
+
+        addTransaction(tx, { summary: withVersion })
+
         setSwapState({
           attemptingTxn: false,
           tradeToConfirm,
           showConfirm,
-          swapErrorMessage: error.message,
-          txHash: undefined
+          swapErrorMessage: undefined,
+          txHash: tx.hash
         })
-      })
+      } catch (err) {
+        console.log(err)
+        if (JSON.parse(JSON.stringify(err))?.code === 4001) {
+          setSwapState({
+            attemptingTxn: false,
+            tradeToConfirm,
+            showConfirm,
+            swapErrorMessage: undefined,
+            txHash: undefined
+          })
+        } else {
+          setSwapState({
+            attemptingTxn: false,
+            tradeToConfirm,
+            showConfirm,
+            swapErrorMessage: 'Transaction failed, this can be caused by prices changes - try increasing slippage', //(err as any)?.message ?? JSON.stringify(err),
+            txHash: undefined
+          })
+        }
+      }
+    }
   }, [
     priceImpactWithoutFee,
     swapCallback,
@@ -250,15 +390,22 @@ export default function Swap() {
   const [showInverted, setShowInverted] = useState<boolean>(false)
 
   // warnings on slippage
-  const priceImpactSeverity = warningSeverity(priceImpactWithoutFee)
+  const priceImpactSeverity = swapMode === 0 ? warningSeverity(priceImpactWithoutFee) : 0
 
   // show approve flow when: no error on inputs, not approved or pending, or approved in current session
   // never show if price impact is above threshold in non expert mode
   const showApproveFlow =
     !swapInputError &&
-    (approval === ApprovalState.NOT_APPROVED ||
-      approval === ApprovalState.PENDING ||
-      (approvalSubmitted && approval === ApprovalState.APPROVED)) &&
+    ((swapMode === 0 &&
+      (approval === ApprovalState.NOT_APPROVED ||
+        approval === ApprovalState.PENDING ||
+        (approvalSubmitted && approval === ApprovalState.APPROVED))) ||
+      (swapMode === 1 &&
+        fusionSwap?.result &&
+        ethers.BigNumber.from(fusionSwap?.result?.route?.amountOutBN ?? '0').gte('0') &&
+        (fusionApproval === ApprovalState.NOT_APPROVED ||
+          fusionApproval === ApprovalState.PENDING ||
+          (approvalSubmitted && fusionApproval === ApprovalState.APPROVED)))) &&
     !(priceImpactSeverity > 3 && !isExpertMode)
 
   const handleConfirmDismiss = useCallback(() => {
@@ -282,7 +429,14 @@ export default function Swap() {
   )
 
   const handleMaxInput = useCallback(() => {
-    maxAmountInput && onUserInput(Field.INPUT, maxAmountInput.toExact())
+    if (maxAmountInput) {
+      let value = maxAmountInput.toExact()
+      const index = value.indexOf('.')
+      if (index > -1 && value.length - index - 1 > (currencies[Field.INPUT]?.decimals ?? 10)) {
+        value = parseInt(value) + '.' + value.slice(index + 1, index + (currencies[Field.INPUT]?.decimals ?? 10) + 1)
+      }
+      onUserInput(Field.INPUT, value)
+    }
   }, [maxAmountInput, onUserInput])
 
   const handleOutputSelect = useCallback(outputCurrency => onCurrencySelection(Field.OUTPUT, outputCurrency), [
@@ -290,6 +444,8 @@ export default function Swap() {
   ])
 
   const swapIsUnsupported = useIsTransactionUnsupported(currencies?.INPUT, currencies?.OUTPUT)
+
+  const isFusionFetching = swapMode === 1 && fusionSwap.loading && !account
 
   return (
     <>
@@ -303,6 +459,8 @@ export default function Swap() {
         <SwapHeader />
         <Wrapper id="swap-page">
           <ConfirmSwapModal
+            swapMode={swapMode}
+            fusionSwap={fusionSwap}
             isOpen={showConfirm}
             trade={trade}
             originalTrade={tradeToConfirm}
@@ -314,6 +472,7 @@ export default function Swap() {
             onConfirm={handleSwap}
             swapErrorMessage={swapErrorMessage}
             onDismiss={handleConfirmDismiss}
+            outPrice={tokenOutPrice}
           />
 
           <AutoColumn gap={'md'}>
@@ -335,7 +494,19 @@ export default function Swap() {
                     size="16"
                     onClick={() => {
                       setApprovalSubmitted(false) // reset 2 step UI for approvals
-                      onSwitchTokens()
+                      onSwitchTokens(
+                        swapMode === 1 && !showWrap ? 1 : undefined,
+                        swapMode === 1 && !showWrap
+                          ? fusionSwap.result
+                            ? currencies.OUTPUT
+                              ? new TokenAmount(
+                                  currencies.OUTPUT as Token,
+                                  ethers.BigNumber.from(fusionSwap.result.route?.amountOutBN ?? '0').toString()
+                                ).toExact()
+                              : undefined
+                            : undefined
+                          : undefined
+                      )
                     }}
                     color={currencies[Field.INPUT] && currencies[Field.OUTPUT] ? theme.primary1 : theme.text2}
                   />
@@ -348,7 +519,22 @@ export default function Swap() {
               </AutoRow>
             </AutoColumn>
             <CurrencyInputPanel
-              value={formattedAmounts[Field.OUTPUT]}
+              value={
+                swapMode === 0 || showWrap
+                  ? formattedAmounts[Field.OUTPUT]
+                  : currencies.OUTPUT
+                  ? new TokenAmount(
+                      currencies.OUTPUT as Token,
+                      ethers.BigNumber.from(fusionSwap?.result?.route?.amountOutBN ?? '0').gt(
+                        ethers.BigNumber.from(fusionSwap?.result?.route?.fee?.amountOutBN ?? '0')
+                      )
+                        ? ethers.BigNumber.from(fusionSwap?.result?.route?.amountOutBN ?? '0')
+                            .sub(ethers.BigNumber.from(fusionSwap?.result?.route?.fee?.amountOutBN ?? '0'))
+                            .toString()
+                        : '0'
+                    ).toSignificant(6)
+                  : '0'
+              }
               onUserInput={handleTypeOutput}
               label={independentField === Field.INPUT && !showWrap && trade ? 'To (estimated)' : 'To'}
               showMaxButton={false}
@@ -356,6 +542,7 @@ export default function Swap() {
               onCurrencySelect={handleOutputSelect}
               otherCurrency={currencies[Field.INPUT]}
               id="swap-currency-output"
+              disabled={swapMode === 1}
             />
 
             {recipient !== null && !showWrap ? (
@@ -375,16 +562,30 @@ export default function Swap() {
             {showWrap ? null : (
               <Card padding={showWrap ? '.25rem 1rem 0 1rem' : '0px'} borderRadius={'20px'}>
                 <AutoColumn gap="8px" style={{ padding: '0 16px' }}>
+                  {swapMode === 1 && (
+                    <RowBetween>
+                      <ToggleStyledText disabled={!isUltra}>Ultra Saving </ToggleStyledText>
+                      <Toggle id="toggle-expert-mode-button" isActive={isUltra} toggle={() => onSwitchUltraMode()} />
+                    </RowBetween>
+                  )}
                   {Boolean(trade) && (
                     <RowBetween align="center">
                       <Text fontWeight={500} fontSize={14} color={theme.text2}>
                         Price
                       </Text>
-                      <TradePrice
-                        price={trade?.executionPrice}
-                        showInverted={showInverted}
-                        setShowInverted={setShowInverted}
-                      />
+                      {swapMode === 0 ? (
+                        <TradePrice
+                          price={trade?.executionPrice}
+                          showInverted={showInverted}
+                          setShowInverted={setShowInverted}
+                        />
+                      ) : (
+                        <FusionPrice
+                          fusionSwap={fusionSwap}
+                          showInverted={showInverted}
+                          setShowInverted={setShowInverted}
+                        ></FusionPrice>
+                      )}
                     </RowBetween>
                   )}
                   {allowedSlippage !== INITIAL_ALLOWED_SLIPPAGE && (
@@ -396,6 +597,16 @@ export default function Swap() {
                         {allowedSlippage / 100}%
                       </ClickableText>
                     </RowBetween>
+                  )}
+                  {isFusionFetching ? (
+                    <Row align="center" color={theme.text3} style={{ justifyContent: 'end' }}>
+                      <TailLoader r={8} />
+                      <TYPE.main color={theme.text3} style={{ marginLeft: '8px' }} fontSize={14}>
+                        Fetching the best price...
+                      </TYPE.main>
+                    </Row>
+                  ) : (
+                    ''
                   )}
                 </AutoColumn>
               </Card>
@@ -413,25 +624,49 @@ export default function Swap() {
                 {wrapInputError ??
                   (wrapType === WrapType.WRAP ? 'Wrap' : wrapType === WrapType.UNWRAP ? 'Unwrap' : null)}
               </ButtonPrimary>
-            ) : noRoute && userHasSpecifiedInputOutput ? (
+            ) : (swapMode === 0 && noRoute && userHasSpecifiedInputOutput) ||
+              (swapMode === 1 && (fusionSwap.result?.route?.amountOut === 0 || fusionSwap.loading)) ? (
               <GreyCard style={{ textAlign: 'center' }}>
-                <TYPE.main mb="4px">Insufficient liquidity for this trade.</TYPE.main>
-                {singleHopOnly && <TYPE.main mb="4px">Try enabling multi-hop trades.</TYPE.main>}
+                {swapMode === 1 && fusionSwap.loading ? (
+                  <TYPE.main display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                    <TailLoader r={13} />
+                    <span style={{ marginLeft: '8px' }}>Fetching the best price.</span>
+                  </TYPE.main>
+                ) : (
+                  <>
+                    <TYPE.main mb="4px">Insufficient liquidity for this trade.</TYPE.main>
+                    {singleHopOnly && <TYPE.main mb="4px">Try enabling multi-hop trades.</TYPE.main>}
+                  </>
+                )}
               </GreyCard>
             ) : showApproveFlow ? (
               <RowBetween>
                 <ButtonConfirmed
-                  onClick={approveCallback}
-                  disabled={approval !== ApprovalState.NOT_APPROVED || approvalSubmitted}
+                  onClick={swapMode === 0 ? approveCallback : fusionApproveCallback}
+                  disabled={
+                    (swapMode === 0 && approval !== ApprovalState.NOT_APPROVED) ||
+                    approvalSubmitted ||
+                    (swapMode === 1 && fusionApproval !== ApprovalState.NOT_APPROVED) ||
+                    approvalSubmitted
+                  }
                   width="48%"
-                  altDisabledStyle={approval === ApprovalState.PENDING} // show solid button while waiting
-                  confirmed={approval === ApprovalState.APPROVED}
+                  altDisabledStyle={
+                    (swapMode === 0 && approval === ApprovalState.PENDING) ||
+                    (swapMode === 1 && fusionApproval === ApprovalState.PENDING)
+                  } // show solid button while waiting
+                  confirmed={
+                    (swapMode === 0 && approval === ApprovalState.APPROVED) ||
+                    (swapMode === 1 && fusionApproval === ApprovalState.APPROVED)
+                  }
                 >
-                  {approval === ApprovalState.PENDING ? (
+                  {(swapMode === 0 && approval === ApprovalState.PENDING) ||
+                  (swapMode === 1 && fusionApproval === ApprovalState.PENDING) ? (
                     <AutoRow gap="6px" justify="center">
                       Approving <Loader stroke="white" />
                     </AutoRow>
-                  ) : approvalSubmitted && approval === ApprovalState.APPROVED ? (
+                  ) : approvalSubmitted &&
+                    ((swapMode === 0 && approval === ApprovalState.APPROVED) ||
+                      (swapMode === 1 && fusionApproval === ApprovalState.APPROVED)) ? (
                     'Approved'
                   ) : (
                     'Approve ' + currencies[Field.INPUT]?.symbol
@@ -454,12 +689,15 @@ export default function Swap() {
                   width="48%"
                   id="swap-button"
                   disabled={
-                    !isValid || approval !== ApprovalState.APPROVED || (priceImpactSeverity > 3 && !isExpertMode)
+                    !isValid ||
+                    (swapMode === 0 && approval !== ApprovalState.APPROVED) ||
+                    (swapMode === 1 && fusionApproval !== ApprovalState.APPROVED) ||
+                    (priceImpactSeverity > 3 && !isExpertMode && swapMode === 0)
                   }
                   error={isValid && priceImpactSeverity > 2}
                 >
                   <Text fontSize={16} fontWeight={500}>
-                    {priceImpactSeverity > 3 && !isExpertMode
+                    {priceImpactSeverity > 3 && swapMode === 0 && !isExpertMode
                       ? `Price Impact High`
                       : `Swap${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
                   </Text>
@@ -481,7 +719,11 @@ export default function Swap() {
                   }
                 }}
                 id="swap-button"
-                disabled={!isValid || (priceImpactSeverity > 3 && !isExpertMode) || !!swapCallbackError}
+                disabled={
+                  !isValid ||
+                  (swapMode === 0 && priceImpactSeverity > 3 && !isExpertMode) ||
+                  (swapMode === 0 && !!swapCallbackError)
+                }
                 error={isValid && priceImpactSeverity > 2 && !swapCallbackError}
               >
                 <Text fontSize={20} fontWeight={500}>
@@ -495,7 +737,12 @@ export default function Swap() {
             )}
             {showApproveFlow && (
               <Column style={{ marginTop: '1rem' }}>
-                <ProgressSteps steps={[approval === ApprovalState.APPROVED]} />
+                <ProgressSteps
+                  steps={[
+                    (swapMode === 0 && approval === ApprovalState.APPROVED) ||
+                      (swapMode === 1 && fusionApproval === ApprovalState.APPROVED)
+                  ]}
+                />
               </Column>
             )}
             {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
@@ -507,11 +754,15 @@ export default function Swap() {
           </BottomGrouping>
         </Wrapper>
       </AppBody>
-      {!swapIsUnsupported ? (
-        <AdvancedSwapDetailsDropdown trade={trade} />
-      ) : (
-        <UnsupportedCurrencyFooter show={swapIsUnsupported} currencies={[currencies.INPUT, currencies.OUTPUT]} />
-      )}
+      {swapMode === 0 ? (
+        !swapIsUnsupported ? (
+          <AdvancedSwapDetailsDropdown trade={trade} />
+        ) : (
+          <UnsupportedCurrencyFooter show={swapIsUnsupported} currencies={[currencies.INPUT, currencies.OUTPUT]} />
+        )
+      ) : swapMode === 1 ? (
+        <AdvancedFusionDetailsDropdown swap={fusionSwap} price={tokenOutPrice} />
+      ) : null}
     </>
   )
 }

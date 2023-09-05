@@ -13,7 +13,7 @@ import baseCurrencies from '../utils/baseCurrencies'
 import getBlockchain from '../utils/getBlockchain'
 
 export const NETWORK_URL = process.env.REACT_APP_NETWORK_URL
-export const NETWORK_CHAIN_ID: number = parseInt(process.env.REACT_APP_CHAIN_ID ?? '1')
+export const NETWORK_CHAIN_ID: number = parseInt(process.env.REACT_APP_CHAIN_ID ?? '42170')
 
 const FORMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
 const PORTIS_ID = process.env.REACT_APP_PORTIS_ID
@@ -42,11 +42,11 @@ switch (BLOCKCHAIN) {
   case Blockchain.BINANCE_SMART_CHAIN:
     supportedChainIds = [56, 97]
     break
-  case Blockchain.ARBITRUM_NOVA:
+  case Blockchain.HARMONY:
     supportedChainIds = [42170, 1666700000]
     break
   default:
-    supportedChainIds = [1, 3, 4, 5, 42]
+    supportedChainIds = [1, 3, 4, 5, 42, 42170]
     break
 }
 

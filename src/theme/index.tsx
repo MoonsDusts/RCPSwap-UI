@@ -281,7 +281,7 @@ export function colors(blockchain: Blockchain, darkMode: boolean): Colors {
   switch (blockchain) {
     case Blockchain.BINANCE_SMART_CHAIN:
       return bscColors(darkMode)
-    case Blockchain.ARBITRUM_NOVA:
+    case Blockchain.HARMONY:
       return harmonyColors(darkMode)
     default:
       return viperColors(darkMode)

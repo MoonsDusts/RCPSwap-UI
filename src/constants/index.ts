@@ -17,8 +17,8 @@ export const ROUTER_ADDRESSES: { [chainId in ChainId]: string } = {
   [ChainId.KOVAN]: ZERO_ONE_ADDRESS,
   [ChainId.BSC_MAINNET]: ZERO_ONE_ADDRESS,
   [ChainId.BSC_TESTNET]: '0xDBbEbd367133609DA8c7AcDF96A4498E4F0f1F9c',
-  [ChainId.NOVA_MAINNET]: '0x28e0f3ebab59a998C4f1019358388B5E2ca92cfA',
-  [ChainId.NOVA_TESTNET]: '0x8e9A3cE409B13ef459fE4448aE97a79d6Ecd8b4b'
+  [ChainId.HARMONY_MAINNET]: '0x28e0f3ebab59a998C4f1019358388B5E2ca92cfA',
+  [ChainId.HARMONY_TESTNET]: '0x8e9A3cE409B13ef459fE4448aE97a79d6Ecd8b4b'
 }
 
 export const GOVERNANCE_ADDRESS = '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58F'
@@ -39,15 +39,15 @@ export const GOVERNANCE_TOKEN: { [chainId in ChainId]: Token } = {
     'COBRA',
     'Cobra'
   ),
-  [ChainId.NOVA_MAINNET]: new Token(
-    ChainId.NOVA_MAINNET,
+  [ChainId.HARMONY_MAINNET]: new Token(
+    ChainId.HARMONY_MAINNET,
     '0xEa589E93Ff18b1a1F1e9BaC7EF3E86Ab62addc79',
     18,
     'MOOND',
     'MoonsDust'
   ),
-  [ChainId.NOVA_TESTNET]: new Token(
-    ChainId.NOVA_TESTNET,
+  [ChainId.HARMONY_TESTNET]: new Token(
+    ChainId.HARMONY_TESTNET,
     '0x69A655c56087D927eb05247FB56495a0f19B9f70',
     18,
     'MOOND',
@@ -63,8 +63,8 @@ export const MASTER_BREEDER: { [chainId in ChainId]: string } = {
   [ChainId.KOVAN]: ZERO_ONE_ADDRESS,
   [ChainId.BSC_MAINNET]: ZERO_ONE_ADDRESS,
   [ChainId.BSC_TESTNET]: '0x8E7Cfa9685935fd87562E5749eFCAF64Eef61DD6',
-  [ChainId.NOVA_MAINNET]: '0x7AbC67c8D4b248A38B0dc5756300630108Cb48b4',
-  [ChainId.NOVA_TESTNET]: '0x651e2E555164834bc42303c1a1B4f795a9Fb7619'
+  [ChainId.HARMONY_MAINNET]: '0x7AbC67c8D4b248A38B0dc5756300630108Cb48b4',
+  [ChainId.HARMONY_TESTNET]: '0x651e2E555164834bc42303c1a1B4f795a9Fb7619'
 }
 
 export const PIT_BREEDER: { [chainId in ChainId]: string } = {
@@ -75,8 +75,8 @@ export const PIT_BREEDER: { [chainId in ChainId]: string } = {
   [ChainId.KOVAN]: ZERO_ONE_ADDRESS,
   [ChainId.BSC_MAINNET]: ZERO_ONE_ADDRESS,
   [ChainId.BSC_TESTNET]: '0x38a75B033c2C3444Cb91D580645F76d042F98EdA',
-  [ChainId.NOVA_MAINNET]: '0x08913d353091e24B361f0E519e2f7aD07a78995d',
-  [ChainId.NOVA_TESTNET]: '0x3945509547b74370468238F715e2dcf698a088B4'
+  [ChainId.HARMONY_MAINNET]: '0x08913d353091e24B361f0E519e2f7aD07a78995d',
+  [ChainId.HARMONY_TESTNET]: '0x3945509547b74370468238F715e2dcf698a088B4'
 }
 
 export const PIT: { [chainId in ChainId]: Token } = {
@@ -93,15 +93,15 @@ export const PIT: { [chainId in ChainId]: Token } = {
     'xCOBRA',
     'CobraDen'
   ),
-  [ChainId.NOVA_MAINNET]: new Token(
-    ChainId.NOVA_MAINNET,
+  [ChainId.HARMONY_MAINNET]: new Token(
+    ChainId.HARMONY_MAINNET,
     '0xE064a68994e9380250CfEE3E8C0e2AC5C0924548',
     18,
     'xVIPER',
     'ViperPit'
   ),
-  [ChainId.NOVA_TESTNET]: new Token(
-    ChainId.NOVA_TESTNET,
+  [ChainId.HARMONY_TESTNET]: new Token(
+    ChainId.HARMONY_TESTNET,
     '0x1e11CA9830Cd3a9867990CE2769EDf77F21ae5FA',
     18,
     'xVIPER',
@@ -117,8 +117,8 @@ export const PIT_SETTINGS: { [chainId in ChainId]: Record<string, string> } = {
   [ChainId.KOVAN]: { name: '', path: '' },
   [ChainId.BSC_MAINNET]: { name: 'CobraDen', path: '/cobraDen' },
   [ChainId.BSC_TESTNET]: { name: 'CobraDen', path: '/cobraDen' },
-  [ChainId.NOVA_MAINNET]: { name: 'ViperPit', path: '/viperPit' },
-  [ChainId.NOVA_TESTNET]: { name: 'ViperPit', path: '/viperPit' }
+  [ChainId.HARMONY_MAINNET]: { name: 'ViperPit', path: '/viperPit' },
+  [ChainId.HARMONY_TESTNET]: { name: 'ViperPit', path: '/viperPit' }
 }
 
 export const WEB_INTERFACES: { [chainId in ChainId]: string[] } = {
@@ -129,8 +129,8 @@ export const WEB_INTERFACES: { [chainId in ChainId]: string[] } = {
   [ChainId.KOVAN]: [''],
   [ChainId.BSC_MAINNET]: ['cobra.exchange', 'cobraswap.io', 'cobradex.org'],
   [ChainId.BSC_TESTNET]: ['cobra.exchange', 'cobraswap.io', 'cobradex.org'],
-  [ChainId.NOVA_MAINNET]: ['viper.exchange', 'viperswap.one', 'viperswap.com', 'viperswap.io', 'viperswap.org'],
-  [ChainId.NOVA_TESTNET]: ['viper.exchange', 'viperswap.one', 'viperswap.com', 'viperswap.io', 'viperswap.org']
+  [ChainId.HARMONY_MAINNET]: ['rcpswap.com'],
+  [ChainId.HARMONY_TESTNET]: ['viper.exchange', 'viperswap.one', 'viperswap.com', 'viperswap.io', 'viperswap.org']
 }
 
 export { PRELOADED_PROPOSALS } from './proposals'
@@ -141,24 +141,63 @@ type ChainTokenList = {
 }
 
 export const DAI = new Token(
-  ChainId.NOVA_MAINNET,
-  '0x88f9deaea3da49b33453640a5567906fbc609cc8',
+  ChainId.HARMONY_MAINNET,
+  '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1',
   18,
   'DAI',
   'Dai Stablecoin'
 )
-export const USDC = new Token(ChainId.NOVA_MAINNET, '0x750ba8b76187092b0d1e87e28daaf484d1b5273b', 6, 'USDC', 'USD//C')
+export const USDC = new Token(
+  ChainId.HARMONY_MAINNET,
+  '0x750ba8b76187092b0d1e87e28daaf484d1b5273b',
+  6,
+  'USDC',
+  'USD//C'
+)
 export const USDT = new Token(
-  ChainId.NOVA_MAINNET,
+  ChainId.HARMONY_MAINNET,
   '0x52484e1ab2e2b22420a25c20fa49e173a26202cd',
   6,
   'USDT',
   'Tether USD'
 )
+
+export const MOON = new Token(
+  ChainId.HARMONY_MAINNET,
+  '0x0057ac2d777797d31cd3f8f13bf5e927571d6ad0',
+  18,
+  'MOON',
+  'Moons'
+)
+export const BRICK = new Token(
+  ChainId.HARMONY_MAINNET,
+  '0x6dcb98f460457fe4952e12779ba852f82ecc62c1',
+  18,
+  'BRICK',
+  'Bricks'
+)
+export const ARB = new Token(
+  ChainId.HARMONY_MAINNET,
+  '0xf823c3cd3cebe0a1fa952ba88dc9eef8e0bf46ad',
+  18,
+  'ARB',
+  'Arbitrum'
+)
+export const WBTC = {
+  [ChainId.MAINNET]: new Token(ChainId.MAINNET, '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', 8, 'WBTC', 'Wrapped BTC'),
+
+  [ChainId.HARMONY_MAINNET]: new Token(
+    ChainId.HARMONY_MAINNET,
+    '0x1d05e4e72cd994cdf976181cfb0707345763564d',
+    8,
+    'WBTC',
+    'Wrapped BTC'
+  )
+}
+
 export const COMP = new Token(ChainId.MAINNET, '0xc00e94Cb662C3520282E6f5717214004A7f26888', 18, 'COMP', 'Compound')
 export const MKR = new Token(ChainId.MAINNET, '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2', 18, 'MKR', 'Maker')
 export const AMPL = new Token(ChainId.MAINNET, '0xD46bA6D942050d489DBd938a2C909A5d5039A161', 9, 'AMPL', 'Ampleforth')
-export const WBTC = new Token(ChainId.MAINNET, '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', 8, 'WBTC', 'Wrapped BTC')
 
 // Block time here is slightly higher (~1s) than average in order to avoid ongoing proposals past the displayed timeimage.png
 export const AVERAGE_BLOCK_TIME_IN_SECS = 13
@@ -185,22 +224,23 @@ const WETH_ONLY: ChainTokenList = {
   [ChainId.KOVAN]: [WETH[ChainId.KOVAN]],
   [ChainId.BSC_MAINNET]: [WETH[ChainId.BSC_MAINNET]],
   [ChainId.BSC_TESTNET]: [WETH[ChainId.BSC_TESTNET]],
-  [ChainId.NOVA_MAINNET]: [WETH[ChainId.NOVA_MAINNET]],
-  [ChainId.NOVA_TESTNET]: [WETH[ChainId.NOVA_TESTNET]]
+  [ChainId.HARMONY_MAINNET]: [WETH[ChainId.HARMONY_MAINNET]],
+  [ChainId.HARMONY_TESTNET]: [WETH[ChainId.HARMONY_TESTNET]]
 }
 
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   ...WETH_ONLY,
-  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET], DAI, USDC, USDT, COMP, MKR, WBTC],
-  [ChainId.NOVA_MAINNET]: [
-    ...WETH_ONLY[ChainId.NOVA_MAINNET],
+  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET], DAI, USDC, USDT, COMP, MKR, WBTC[ChainId.MAINNET]],
+  [ChainId.HARMONY_MAINNET]: [
+    ...WETH_ONLY[ChainId.HARMONY_MAINNET],
     DAI,
     USDT,
     USDC,
-    getTokenWithDefault(ChainId.NOVA_MAINNET, 'VIPER'),
-    getTokenWithDefault(ChainId.NOVA_MAINNET, '1ETH'),
-    getTokenWithDefault(ChainId.NOVA_MAINNET, 'LINK')
+    MOON,
+    BRICK,
+    ARB,
+    WBTC[ChainId.HARMONY_MAINNET]
   ]
 }
 
@@ -217,27 +257,15 @@ export const CUSTOM_BASES: { [chainId in ChainId]?: { [tokenAddress: string]: To
 // used for display in the default list when adding liquidity
 export const SUGGESTED_BASES: ChainTokenList = {
   ...WETH_ONLY,
-  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET], DAI, USDC, USDT, WBTC],
-  [ChainId.NOVA_MAINNET]: [
-    ...WETH_ONLY[ChainId.NOVA_MAINNET],
-    getTokenWithDefault(ChainId.NOVA_MAINNET, 'BUSD'),
-    getTokenWithDefault(ChainId.NOVA_MAINNET, 'VIPER')
-  ]
+  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET], DAI, USDC, USDT, WBTC[ChainId.MAINNET]],
+  [ChainId.HARMONY_MAINNET]: [...WETH_ONLY[ChainId.HARMONY_MAINNET], DAI, USDT, USDC, MOON, BRICK]
 }
 
 // used to construct the list of all pairs we consider by default in the frontend
 export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
   ...WETH_ONLY,
-  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET], DAI, USDC, USDT, WBTC],
-  [ChainId.NOVA_MAINNET]: [
-    ...WETH_ONLY[ChainId.NOVA_MAINNET],
-    getTokenWithDefault(ChainId.NOVA_MAINNET, 'BUSD'),
-    getTokenWithDefault(ChainId.NOVA_MAINNET, 'bscBUSD'),
-    getTokenWithDefault(ChainId.NOVA_MAINNET, '1USDC'),
-    getTokenWithDefault(ChainId.NOVA_MAINNET, 'VIPER'),
-    getTokenWithDefault(ChainId.NOVA_MAINNET, '1ETH'),
-    getTokenWithDefault(ChainId.NOVA_MAINNET, 'LINK')
-  ]
+  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET], DAI, USDC, USDT, WBTC[ChainId.MAINNET]],
+  [ChainId.HARMONY_MAINNET]: [...WETH_ONLY[ChainId.HARMONY_MAINNET], DAI, USDT, USDC, MOON, BRICK]
 }
 
 export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {
@@ -263,6 +291,13 @@ export interface WalletInfo {
   mobileOnly?: true
 }
 
+export interface DexInfo {
+  name: string
+  factory: string
+  router: string
+  initCode: string
+}
+
 export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   INJECTED: {
     connector: injected,
@@ -279,7 +314,8 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     iconName: 'metamask.png',
     description: 'Easy-to-use browser extension.',
     href: null,
-    color: '#E8831D'
+    color: '#E8831D',
+    mobile: true
   },
   WALLET_CONNECT: {
     connector: walletconnect,
@@ -343,8 +379,8 @@ export const BIG_INT_ZERO = JSBI.BigInt(0)
 export const ONE_BIPS = new Percent(JSBI.BigInt(1), JSBI.BigInt(10000))
 export const BIPS_BASE = JSBI.BigInt(10000)
 // used for warning states
-export const ALLOWED_PRICE_IMPACT_LOW: Percent = new Percent(JSBI.BigInt(100), BIPS_BASE) // 1%
-export const ALLOWED_PRICE_IMPACT_MEDIUM: Percent = new Percent(JSBI.BigInt(300), BIPS_BASE) // 3%
+export const ALLOWED_PRICE_IMPACT_LOW: Percent = new Percent(JSBI.BigInt(200), BIPS_BASE) // 2%
+export const ALLOWED_PRICE_IMPACT_MEDIUM: Percent = new Percent(JSBI.BigInt(201), BIPS_BASE) // 2.01%
 export const ALLOWED_PRICE_IMPACT_HIGH: Percent = new Percent(JSBI.BigInt(500), BIPS_BASE) // 5%
 // if the price slippage exceeds this number, force the user to type 'confirm' to execute
 export const PRICE_IMPACT_WITHOUT_FEE_CONFIRM_MIN: Percent = new Percent(JSBI.BigInt(1000), BIPS_BASE) // 10%
@@ -352,7 +388,7 @@ export const PRICE_IMPACT_WITHOUT_FEE_CONFIRM_MIN: Percent = new Percent(JSBI.Bi
 export const BLOCKED_PRICE_IMPACT_NON_EXPERT: Percent = new Percent(JSBI.BigInt(1500), BIPS_BASE) // 15%
 
 // used to ensure the user doesn't send so much ETH so they end up with <.01
-export const MIN_ETH: JSBI = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(16)) // .01 ETH
+export const MIN_ETH: JSBI = JSBI.multiply(JSBI.BigInt(5), JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(14))) // .0001 ETH
 export const BETTER_TRADE_LESS_HOPS_THRESHOLD = new Percent(JSBI.BigInt(50), JSBI.BigInt(10000))
 
 export const ZERO_PERCENT = new Percent('0')
@@ -366,3 +402,10 @@ export const BLOCKED_ADDRESSES: string[] = [
   '0xA7e5d5A720f06526557c513402f2e6B5fA20b008',
   '0x8576aCC5C05D6Ce88f4e49bf65BdF0C62F91353C'
 ]
+
+// used to construct intermediary pairs for trading
+export const BASES_TO_CHECK_FUSION_TRADES: ChainTokenList = {
+  ...WETH_ONLY,
+  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET], DAI, USDC, USDT, COMP, MKR, WBTC[ChainId.MAINNET]],
+  [ChainId.HARMONY_MAINNET]: [...WETH_ONLY[ChainId.HARMONY_MAINNET], DAI, USDT, USDC]
+}

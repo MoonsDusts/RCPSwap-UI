@@ -26,7 +26,7 @@ const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
   42: 'kovan.',
   56: 'bscscan.com',
   97: 'testnet.bscscan.com',
-  42170: 'nova-explorer.arbitrum.io',
+  42170: 'nova.arbiscan.io',
   1666700000: 'explorer.testnet.harmony.one/#'
 }
 
@@ -85,17 +85,20 @@ export function calculateSlippageAmount(value: CurrencyAmount, slippage: number)
 }
 
 // account is not optional
-export function getSigner(library: Web3Provider, account: string): JsonRpcSigner {
-  return library.getSigner(account).connectUnchecked()
+export function getSigner(library: Web3Provider | undefined, account: string): JsonRpcSigner | undefined {
+  return library?.getSigner(account).connectUnchecked()
 }
 
 // account is optional
-export function getProviderOrSigner(library: Web3Provider, account?: string): Web3Provider | JsonRpcSigner {
+export function getProviderOrSigner(
+  library: Web3Provider | undefined,
+  account?: string
+): Web3Provider | JsonRpcSigner | undefined {
   return account ? getSigner(library, account) : library
 }
 
 // account is optional
-export function getContract(address: string, ABI: any, library: Web3Provider, account?: string): Contract {
+export function getContract(address: string, ABI: any, library: Web3Provider | undefined, account?: string): Contract {
   if (!isAddress(address) || address === AddressZero) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }

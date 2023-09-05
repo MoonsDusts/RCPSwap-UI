@@ -1,4 +1,4 @@
-import { currencyEquals, Trade } from '@venomswap/sdk'
+import { currencyEquals, Token, TokenAmount, Trade } from '@venomswap/sdk'
 import React, { useCallback, useMemo } from 'react'
 import TransactionConfirmationModal, {
   ConfirmationModalContent,
@@ -9,6 +9,8 @@ import SwapModalHeader from './SwapModalHeader'
 
 import useBlockchain from '../../hooks/useBlockchain'
 import getBlockchainAdjustedCurrency from '../../utils/getBlockchainAdjustedCurrency'
+import { XFusionSwapType } from 'state/swap/hooks'
+import { ethers } from 'ethers'
 
 /**
  * Returns true if the trade requires a confirmation of details before we can submit it
@@ -36,7 +38,10 @@ export default function ConfirmSwapModal({
   swapErrorMessage,
   isOpen,
   attemptingTxn,
-  txHash
+  txHash,
+  swapMode,
+  fusionSwap,
+  outPrice
 }: {
   isOpen: boolean
   trade: Trade | undefined
@@ -49,6 +54,9 @@ export default function ConfirmSwapModal({
   onConfirm: () => void
   swapErrorMessage: string | undefined
   onDismiss: () => void
+  swapMode: number
+  fusionSwap: XFusionSwapType
+  outPrice: number
 }) {
   const blockchain = useBlockchain()
 
@@ -58,9 +66,11 @@ export default function ConfirmSwapModal({
   )
 
   const modalHeader = useCallback(() => {
-    return trade ? (
+    return trade || swapMode === 1 ? (
       <SwapModalHeader
         trade={trade}
+        fusionSwap={fusionSwap}
+        swapMode={swapMode}
         allowedSlippage={allowedSlippage}
         recipient={recipient}
         showAcceptChanges={showAcceptChanges}
@@ -70,39 +80,57 @@ export default function ConfirmSwapModal({
   }, [allowedSlippage, onAcceptChanges, recipient, showAcceptChanges, trade])
 
   const modalBottom = useCallback(() => {
-    return trade ? (
+    return trade || swapMode === 1 ? (
       <SwapModalFooter
         onConfirm={onConfirm}
         trade={trade}
+        swapMode={swapMode}
+        fusionSwap={fusionSwap}
         disabledConfirm={showAcceptChanges}
         swapErrorMessage={swapErrorMessage}
         allowedSlippage={allowedSlippage}
+        outPrice={outPrice}
       />
     ) : null
   }, [allowedSlippage, onConfirm, showAcceptChanges, swapErrorMessage, trade])
 
-  const adjustedInputCurrency = getBlockchainAdjustedCurrency(blockchain, trade?.inputAmount?.currency)
-  const adjustedOutputCurrency = getBlockchainAdjustedCurrency(blockchain, trade?.outputAmount?.currency)
+  const adjustedInputCurrency = getBlockchainAdjustedCurrency(
+    blockchain,
+    trade?.inputAmount?.currency ?? fusionSwap?.currencies?.INPUT
+  )
+  const adjustedOutputCurrency = getBlockchainAdjustedCurrency(
+    blockchain,
+    trade?.outputAmount?.currency ?? fusionSwap?.currencies?.OUTPUT
+  )
 
   // text to show while loading
-  const pendingText = `Swapping ${trade?.inputAmount?.toSignificant(6)} ${
+  const pendingText = `Swapping ${trade?.inputAmount?.toSignificant(6) ?? fusionSwap.parsedAmount?.toSignificant(6)} ${
     adjustedInputCurrency?.symbol
-  } for ${trade?.outputAmount?.toSignificant(6)} ${adjustedOutputCurrency?.symbol}`
+  } for ${
+    swapMode === 0
+      ? trade?.outputAmount?.toSignificant(6)
+      : fusionSwap.currencies?.OUTPUT
+      ? new TokenAmount(
+          fusionSwap.currencies?.OUTPUT as Token,
+          ethers.BigNumber.from(fusionSwap?.result.route?.amountOutBN ?? '0')
+            .sub(fusionSwap.result?.route?.fee?.amountOutBN ?? '0')
+            .toString()
+        ).toSignificant(6)
+      : '0'
+  } ${adjustedOutputCurrency?.symbol}`
 
-  const confirmationContent = useCallback(
-    () =>
-      swapErrorMessage ? (
-        <TransactionErrorContent onDismiss={onDismiss} message={swapErrorMessage} />
-      ) : (
-        <ConfirmationModalContent
-          title="Confirm Swap"
-          onDismiss={onDismiss}
-          topContent={modalHeader}
-          bottomContent={modalBottom}
-        />
-      ),
-    [onDismiss, modalBottom, modalHeader, swapErrorMessage]
-  )
+  const confirmationContent = useCallback(() => {
+    return swapErrorMessage ? (
+      <TransactionErrorContent onDismiss={onDismiss} message={swapErrorMessage} />
+    ) : (
+      <ConfirmationModalContent
+        title="Confirm Swap"
+        onDismiss={onDismiss}
+        topContent={modalHeader}
+        bottomContent={modalBottom}
+      />
+    )
+  }, [onDismiss, modalBottom, modalHeader, swapErrorMessage])
 
   return (
     <TransactionConfirmationModal

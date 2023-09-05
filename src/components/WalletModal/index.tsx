@@ -224,7 +224,7 @@ export default function WalletModal({
           return null
         }
 
-        if (!window.web3 && !window.ethereum && option.mobile) {
+        if (option.mobile) {
           return (
             <Option
               onClick={() => {
@@ -369,12 +369,10 @@ export default function WalletModal({
                   <ExternalLink href="https://ethereum.org/wallets/">Learn more about Nova</ExternalLink>
                 </>
               )}
-              {blockchain === Blockchain.ARBITRUM_NOVA && (
+              {blockchain === Blockchain.HARMONY && (
                 <>
                   <span>New? &nbsp;</span>{' '}
-                  <ExternalLink href="https://medium.com/offchainlabs/introducing-nova-arbitrum-anytrust-mainnet-is-open-for-developers-9a54692f345e">
-                    Learn more about Nova
-                  </ExternalLink>
+                  <ExternalLink href="https://nova.arbitrum.io/">Learn more about Nova</ExternalLink>
                 </>
               )}
             </Blurb>

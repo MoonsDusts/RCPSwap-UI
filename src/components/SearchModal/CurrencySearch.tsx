@@ -1,4 +1,4 @@
-import { Currency, ETHER, ARBITRUM_NOVA, BINANCE_COIN, Token } from '@venomswap/sdk'
+import { Currency, ETHER, HARMONY, BINANCE_COIN, Token } from '@venomswap/sdk'
 import React, { KeyboardEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactGA from 'react-ga'
 import { useTranslation } from 'react-i18next'
@@ -138,7 +138,7 @@ export function CurrencySearch({
         if (s === 'eth') {
           handleCurrencySelect(ETHER)
         } else if (s === 'one') {
-          handleCurrencySelect(ARBITRUM_NOVA)
+          handleCurrencySelect(HARMONY)
         } else if (s === 'bnb') {
           handleCurrencySelect(BINANCE_COIN)
         } else if (filteredSortedTokens.length > 0) {

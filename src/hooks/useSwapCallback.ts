@@ -134,7 +134,6 @@ export function useSwapCallback(
         return { state: SwapCallbackState.LOADING, callback: null, error: null }
       }
     }
-
     const tradeVersion = getTradeVersion(trade)
 
     return {
@@ -200,7 +199,7 @@ export function useSwapCallback(
           },
           gasEstimate
         } = successfulEstimation
-
+        console.log('gasEstimate is' + gasEstimate)
         return contract[methodName](...args, {
           gasLimit: calculateGasMargin(gasEstimate),
           ...(value && !isZero(value) ? { value, from: account } : { from: account })
@@ -215,7 +214,6 @@ export function useSwapCallback(
             const outputAmount = trade.outputAmount.toSignificant(3)
 
             const base = `Swap ${inputAmount} ${adjustedInputCurrency?.symbol} for ${outputAmount} ${adjustedOutputCurrency?.symbol}`
-
             const withRecipient =
               recipient === account
                 ? base

@@ -217,7 +217,7 @@ export default function GovTokenBalanceContent({ setShowUniBalanceModal }: { set
             </RowBetween>
           </AutoColumn>
         </CardSection>
-        {blockchain === Blockchain.ARBITRUM_NOVA && govTokenPrice && circulatingMarketCap && totalMarketCap && (
+        {blockchain === Blockchain.HARMONY && govTokenPrice && circulatingMarketCap && totalMarketCap && (
           <>
             <Break />
             <CardSection gap="sm">
