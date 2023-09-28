@@ -64,6 +64,7 @@ import { calculateSlippageAmount, isAddress, shortenAddress } from 'utils'
 import TailLoader from '../../components/Loader/TailLoader'
 import Toggle from 'components/Toggle'
 import { useTransactionAdder } from 'state/transactions/hooks'
+import Banner from 'components/Banner'
 
 export default function Swap() {
   const loadedUrlParams = useDefaultsFromURLSearch()
@@ -763,6 +764,7 @@ export default function Swap() {
       ) : swapMode === 1 ? (
         <AdvancedFusionDetailsDropdown swap={fusionSwap} price={tokenOutPrice} />
       ) : null}
+      <Banner />
     </>
   )
 }
