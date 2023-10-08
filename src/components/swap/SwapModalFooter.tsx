@@ -1,4 +1,4 @@
-import { Currency, Token, TokenAmount, Trade, TradeType } from '@rcpswap/sdk'
+import { ChainId, Currency, Token, TokenAmount, Trade, TradeType } from '@rcpswap/sdk'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { Repeat, Type } from 'react-feather'
 import { Text } from 'rebass'
@@ -21,6 +21,8 @@ import useBlockchain from '../../hooks/useBlockchain'
 import getBlockchainAdjustedCurrency from '../../utils/getBlockchainAdjustedCurrency'
 import { XFusionSwapType } from 'state/swap/hooks'
 import { ethers } from 'ethers'
+import usePrice from 'hooks/usePrice'
+import { wrappedCurrency } from 'utils/wrappedCurrency'
 
 export default function SwapModalFooter({
   trade,
@@ -29,8 +31,7 @@ export default function SwapModalFooter({
   swapErrorMessage,
   disabledConfirm,
   swapMode,
-  fusionSwap,
-  outPrice
+  fusionSwap
 }: {
   trade: Trade | undefined
   swapMode: number
@@ -39,7 +40,6 @@ export default function SwapModalFooter({
   onConfirm: () => void
   swapErrorMessage: string | undefined
   disabledConfirm: boolean
-  outPrice: number
 }) {
   const blockchain = useBlockchain()
 
@@ -52,6 +52,10 @@ export default function SwapModalFooter({
   const { priceImpactWithoutFee, realizedLPFee } = useMemo(() => computeTradePriceBreakdown(trade), [trade])
   const severity = warningSeverity(priceImpactWithoutFee)
 
+  const { data: price, isInitialLoading: isPriceLoading } = usePrice(
+    wrappedCurrency(fusionSwap.currencies?.OUTPUT, ChainId.ARBITRUM_NOVA)?.address
+  )
+
   const tradeInputCurrency = getBlockchainAdjustedCurrency(
     blockchain,
     trade?.inputAmount.currency ?? fusionSwap?.currencies?.INPUT
@@ -60,6 +64,31 @@ export default function SwapModalFooter({
     blockchain,
     trade?.outputAmount.currency ?? fusionSwap?.currencies?.OUTPUT
   )
+
+  const saving =
+    swapMode === 1 &&
+    fusionSwap.result?.route &&
+    ethers.BigNumber.from(fusionSwap.result.route?.fee?.amountOutBN ?? '0').gt('0') &&
+    fusionSwap.result.route
+      ? parseFloat(
+          new TokenAmount(
+            fusionSwap.currencies?.OUTPUT as Token,
+            ethers.BigNumber.from(fusionSwap.result.route.amountOutBN ?? '0').toString()
+          ).toExact()
+        ) -
+        parseFloat(
+          new TokenAmount(
+            fusionSwap.currencies?.OUTPUT as Token,
+            ethers.BigNumber.from(fusionSwap.result?.route.fee?.amountOutBN ?? '0').toString()
+          ).toExact()
+        ) -
+        parseFloat(
+          new TokenAmount(
+            fusionSwap.currencies?.OUTPUT as Token,
+            ethers.BigNumber.from(fusionSwap.result.route.singleProviderRoute?.amountOutBN ?? '0').toString()
+          ).toExact()
+        )
+      : 0
 
   return (
     <>
@@ -183,7 +212,8 @@ export default function SwapModalFooter({
         )}
         {swapMode === 1 &&
           ethers.BigNumber.from(fusionSwap.result.route?.fee?.amountOutBN ?? '0').gt('0') &&
-          fusionSwap.result.route && (
+          fusionSwap.result.route &&
+          saving > 0 && (
             <RowBetween>
               <RowFixed>
                 <Text fontSize={14} fontWeight={400} color={theme.green1}>
@@ -192,33 +222,11 @@ export default function SwapModalFooter({
                 <QuestionHelper text={`Saving compared with the best price found on any DEX on Nova.`} />
               </RowFixed>
               <TYPE.black fontSize={14}>
-                {(
-                  Math.max(
-                    parseFloat(
-                      new TokenAmount(
-                        fusionSwap.currencies?.OUTPUT as Token,
-                        ethers.BigNumber.from(fusionSwap.result.route.amountOutBN ?? '0').toString()
-                      ).toExact()
-                    ) -
-                      parseFloat(
-                        new TokenAmount(
-                          fusionSwap.currencies?.OUTPUT as Token,
-                          ethers.BigNumber.from(fusionSwap.result?.route.fee?.amountOutBN ?? '0').toString()
-                        ).toExact()
-                      ) -
-                      parseFloat(
-                        new TokenAmount(
-                          fusionSwap.currencies?.OUTPUT as Token,
-                          ethers.BigNumber.from(
-                            fusionSwap.result.route.singleProviderRoute?.amountOutBN ?? '0'
-                          ).toString()
-                        ).toExact()
-                      ),
-                    0
-                  ) * (outPrice === 0 ? 1 : outPrice)
-                ).toFixed(6) +
+                {(saving * (isPriceLoading || !price || price.equalTo('0') ? 1 : parseFloat(price.toFixed(6)))).toFixed(
+                  6
+                ) +
                   ' ' +
-                  (outPrice === 0 ? tradeOutputCurrency?.symbol : '$')}
+                  (isPriceLoading || !price || price.equalTo('0') ? tradeOutputCurrency?.symbol : '$')}
               </TYPE.black>
             </RowBetween>
           )}

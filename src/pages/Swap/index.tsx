@@ -59,12 +59,16 @@ import FusionPrice from 'components/swap/FusionPrice'
 import { BigNumber, ethers } from 'ethers'
 import { FUSION_CONTRACT } from 'contracts'
 import AdvancedFusionDetailsDropdown from 'components/swap/AdvancedFusionDetailsDropdown'
-import { useTokenPrice } from 'hooks/useTokenPrice'
 import { calculateSlippageAmount, isAddress, shortenAddress } from 'utils'
 import TailLoader from '../../components/Loader/TailLoader'
 import Toggle from 'components/Toggle'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import Banner from 'components/Banner'
+import StepSlider from 'components/StepSlider'
+import toFormat from 'toformat'
+import _Big from 'big.js'
+import useParsedTokenPrice from 'hooks/useParsedTokenPrice'
+// import AlertSound from '../../assets/sounds/alert.mp3'
 
 export default function Swap() {
   const loadedUrlParams = useDefaultsFromURLSearch()
@@ -104,6 +108,17 @@ export default function Swap() {
 
   // get custom setting values for user
   const [allowedSlippage] = useUserSlippageTolerance()
+
+  // sound
+
+  // const [alertSound] = useState(new Audio(AlertSound))
+
+  // useEffect(() => {
+  //   return () => {
+  //     alertSound.pause()
+  //   }
+  // }, [])
+
   // swap state
   const {
     independentField,
@@ -124,8 +139,6 @@ export default function Swap() {
   } = useDerivedSwapInfo()
 
   const fusionSwap = useXFusionSwap()
-
-  console.log(fusionSwap)
 
   const { wrapType, execute: onWrap, inputError: wrapInputError } = useWrapCallback(
     currencies[Field.INPUT],
@@ -171,7 +184,6 @@ export default function Swap() {
       if (index > -1 && value.length - index - 1 > (currencies[Field.INPUT]?.decimals ?? 10)) {
         value = parseInt(value) + '.' + value.slice(index + 1, index + (currencies[Field.INPUT]?.decimals ?? 10) + 1)
       }
-      console.log(value)
 
       onUserInput(Field.INPUT, value)
     },
@@ -221,8 +233,6 @@ export default function Swap() {
 
   // check if user has gone through approval process, used to show two step buttons, reset on token change
   const [approvalSubmitted, setApprovalSubmitted] = useState<boolean>(false)
-
-  const tokenOutPrice = useTokenPrice(fusionSwap.currencies?.OUTPUT, swapMode === 1)
 
   const addTransaction = useTransactionAdder()
 
@@ -387,11 +397,26 @@ export default function Swap() {
     singleHopOnly
   ])
 
+  // percentage slide
+  const [percentageSlide, setPercentageSlide] = useState(0)
+
   // errors
   const [showInverted, setShowInverted] = useState<boolean>(false)
 
   // warnings on slippage
   const priceImpactSeverity = swapMode === 0 ? warningSeverity(priceImpactWithoutFee) : 0
+
+  useEffect(() => {
+    if (maxAmountInput) {
+      if (maxAmountInput.equalTo('0')) {
+        setPercentageSlide(0)
+      } else {
+        const percenage =
+          parseFloat(parsedAmounts[Field.INPUT]?.toExact() ?? '0') / parseFloat(maxAmountInput.toExact())
+        setPercentageSlide(Math.min(Math.floor(percenage * 100), 100))
+      }
+    }
+  }, [maxAmountInput, parsedAmounts[Field.INPUT]?.toExact()])
 
   // show approve flow when: no error on inputs, not approved or pending, or approved in current session
   // never show if price impact is above threshold in non expert mode
@@ -408,6 +433,26 @@ export default function Swap() {
           fusionApproval === ApprovalState.PENDING ||
           (approvalSubmitted && fusionApproval === ApprovalState.APPROVED)))) &&
     !(priceImpactSeverity > 3 && !isExpertMode)
+
+  const outputTokenValue =
+    swapMode === 0 || showWrap
+      ? formattedAmounts[Field.OUTPUT]
+      : currencies.OUTPUT
+      ? new TokenAmount(
+          currencies.OUTPUT as Token,
+          ethers.BigNumber.from(fusionSwap?.result?.route?.amountOutBN ?? '0').gt(
+            ethers.BigNumber.from(fusionSwap?.result?.route?.fee?.amountOutBN ?? '0')
+          )
+            ? ethers.BigNumber.from(fusionSwap?.result?.route?.amountOutBN ?? '0')
+                .sub(ethers.BigNumber.from(fusionSwap?.result?.route?.fee?.amountOutBN ?? '0'))
+                .toString()
+            : '0'
+        ).toSignificant(6)
+      : '0'
+
+  // token prices
+  const inputTokenPrice = useParsedTokenPrice(currencies[Field.INPUT], formattedAmounts[Field.INPUT])
+  const outputTokenPrice = useParsedTokenPrice(currencies[Field.OUTPUT], outputTokenValue)
 
   const handleConfirmDismiss = useCallback(() => {
     setSwapState({ showConfirm: false, tradeToConfirm, attemptingTxn, swapErrorMessage, txHash })
@@ -429,16 +474,27 @@ export default function Swap() {
     [onCurrencySelection]
   )
 
-  const handleMaxInput = useCallback(() => {
-    if (maxAmountInput) {
-      let value = maxAmountInput.toExact()
-      const index = value.indexOf('.')
-      if (index > -1 && value.length - index - 1 > (currencies[Field.INPUT]?.decimals ?? 10)) {
-        value = parseInt(value) + '.' + value.slice(index + 1, index + (currencies[Field.INPUT]?.decimals ?? 10) + 1)
+  const handlePercentageSlide = useCallback(
+    (step: number) => {
+      setPercentageSlide(step)
+
+      if (maxAmountInput) {
+        const particalAmount = maxAmountInput.multiply(step.toString()).divide('100')
+        const Big = toFormat(_Big)
+        Big.DP = maxAmountInput.currency.decimals
+        let value = new Big(particalAmount.numerator.toString())
+          .div(particalAmount.denominator.toString())
+          .toFormat({ groupSeparator: '' })
+
+        const index = value.indexOf('.')
+        if (index > -1 && value.length - index - 1 > (currencies[Field.INPUT]?.decimals ?? 10)) {
+          value = parseInt(value) + '.' + value.slice(index + 1, index + (currencies[Field.INPUT]?.decimals ?? 10) + 1)
+        }
+        onUserInput(Field.INPUT, value)
       }
-      onUserInput(Field.INPUT, value)
-    }
-  }, [maxAmountInput, onUserInput])
+    },
+    [maxAmountInput, onUserInput]
+  )
 
   const handleOutputSelect = useCallback(outputCurrency => onCurrencySelection(Field.OUTPUT, outputCurrency), [
     onCurrencySelection
@@ -473,21 +529,21 @@ export default function Swap() {
             onConfirm={handleSwap}
             swapErrorMessage={swapErrorMessage}
             onDismiss={handleConfirmDismiss}
-            outPrice={tokenOutPrice}
           />
 
           <AutoColumn gap={'md'}>
             <CurrencyInputPanel
               label={independentField === Field.OUTPUT && !showWrap && trade ? 'From (estimated)' : 'From'}
               value={formattedAmounts[Field.INPUT]}
-              showMaxButton={!atMaxAmountInput}
               currency={currencies[Field.INPUT]}
               onUserInput={handleTypeInput}
-              onMax={handleMaxInput}
               onCurrencySelect={handleInputSelect}
               otherCurrency={currencies[Field.OUTPUT]}
+              inPrice={inputTokenPrice}
+              outPrice={outputTokenPrice}
               id="swap-currency-input"
             />
+            <StepSlider step={percentageSlide} onChange={handlePercentageSlide} enabled={Boolean(maxAmountInput)} />
             <AutoColumn justify="space-between">
               <AutoRow justify={isExpertMode ? 'space-between' : 'center'} style={{ padding: '0 1rem' }}>
                 <ArrowWrapper clickable>
@@ -520,22 +576,7 @@ export default function Swap() {
               </AutoRow>
             </AutoColumn>
             <CurrencyInputPanel
-              value={
-                swapMode === 0 || showWrap
-                  ? formattedAmounts[Field.OUTPUT]
-                  : currencies.OUTPUT
-                  ? new TokenAmount(
-                      currencies.OUTPUT as Token,
-                      ethers.BigNumber.from(fusionSwap?.result?.route?.amountOutBN ?? '0').gt(
-                        ethers.BigNumber.from(fusionSwap?.result?.route?.fee?.amountOutBN ?? '0')
-                      )
-                        ? ethers.BigNumber.from(fusionSwap?.result?.route?.amountOutBN ?? '0')
-                            .sub(ethers.BigNumber.from(fusionSwap?.result?.route?.fee?.amountOutBN ?? '0'))
-                            .toString()
-                        : '0'
-                    ).toSignificant(6)
-                  : '0'
-              }
+              value={outputTokenValue}
               onUserInput={handleTypeOutput}
               label={independentField === Field.INPUT && !showWrap && trade ? 'To (estimated)' : 'To'}
               showMaxButton={false}
@@ -544,6 +585,10 @@ export default function Swap() {
               otherCurrency={currencies[Field.INPUT]}
               id="swap-currency-output"
               disabled={swapMode === 1}
+              inPrice={outputTokenPrice}
+              outPrice={inputTokenPrice}
+              showPriceImpact
+              loading={swapMode === 1 && fusionSwap.loading}
             />
 
             {recipient !== null && !showWrap ? (
@@ -762,7 +807,7 @@ export default function Swap() {
           <UnsupportedCurrencyFooter show={swapIsUnsupported} currencies={[currencies.INPUT, currencies.OUTPUT]} />
         )
       ) : swapMode === 1 ? (
-        <AdvancedFusionDetailsDropdown swap={fusionSwap} price={tokenOutPrice} />
+        <AdvancedFusionDetailsDropdown swap={fusionSwap} currency={fusionSwap.currencies?.OUTPUT} />
       ) : null}
       <Banner />
     </>

@@ -1,5 +1,5 @@
-import { Currency, CurrencyAmount, Pair } from '@rcpswap/sdk'
-import React, { useState, useCallback } from 'react'
+import { ChainId, Currency, CurrencyAmount, Fraction, Pair } from '@rcpswap/sdk'
+import React, { useState, useCallback, useMemo } from 'react'
 import styled from 'styled-components'
 import { darken } from 'polished'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
@@ -55,6 +55,13 @@ const LabelRow = styled.div`
   }
 `
 
+const PriceRow = styled.div`
+  ${({ theme }) => theme.flexRowNoWrap}
+  color: ${({ theme }) => theme.text3};
+  font-size: 0.75rem;
+  padding: 0 0.75rem 0.75rem 1rem;
+`
+
 const Aligner = styled.span`
   display: flex;
   align-items: center;
@@ -88,7 +95,10 @@ const Container = styled.div<{ hideInput: boolean; disabled?: boolean }>`
 const StyledTokenName = styled.span<{ active?: boolean }>`
   ${({ active }) => (active ? '  margin: 0 0.25rem 0 0.75rem;' : '  margin: 0 0.25rem 0 0.25rem;')}
   font-size:  ${({ active }) => (active ? '20px' : '16px')};
+`
 
+const PriceImpact = styled.span<{ impact: number }>`
+  color: ${({ impact, theme }) => (impact <= -5 ? '#e61537' : impact <= -2 ? '#f7c40c' : theme.green1)};
 `
 
 const StyledBalanceMax = styled.button`
@@ -133,6 +143,10 @@ interface CurrencyInputPanelProps {
   customBalanceText?: string
   overrideSelectedCurrencyBalance?: CurrencyAmount | null
   disabled?: boolean
+  inPrice: { totalPrice: Fraction; price: Fraction | undefined; loading: boolean }
+  outPrice: { totalPrice: Fraction; price: Fraction | undefined; loading: boolean }
+  showPriceImpact?: boolean
+  loading?: boolean
 }
 
 export default function CurrencyInputPanel({
@@ -152,7 +166,11 @@ export default function CurrencyInputPanel({
   showCommonBases,
   customBalanceText,
   overrideSelectedCurrencyBalance = null,
-  disabled = false
+  disabled = false,
+  inPrice,
+  outPrice,
+  showPriceImpact = false,
+  loading = false
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
 
@@ -167,6 +185,10 @@ export default function CurrencyInputPanel({
   const handleDismissSearch = useCallback(() => {
     setModalOpen(false)
   }, [setModalOpen])
+
+  const impact = outPrice.totalPrice.greaterThan(0)
+    ? parseFloat(inPrice.totalPrice.divide(outPrice.totalPrice).toFixed(6)) * 100 - 100
+    : 0
 
   return (
     <InputPanel id={id}>
@@ -241,6 +263,22 @@ export default function CurrencyInputPanel({
             </Aligner>
           </CurrencySelect>
         </InputRow>
+        <PriceRow>
+          {!inPrice.loading && inPrice.price?.equalTo('0')
+            ? 'Price not available'
+            : `~$ ${
+                loading
+                  ? '0.00'
+                  : parseFloat(inPrice.totalPrice.toFixed(2)).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })
+              }`}
+          &nbsp;
+          {showPriceImpact && outPrice.totalPrice?.greaterThan('0') && inPrice.totalPrice.greaterThan('0') ? (
+            <PriceImpact impact={loading ? 0 : impact}>({loading ? '0.00' : impact.toFixed(2)}%)</PriceImpact>
+          ) : null}
+        </PriceRow>
       </Container>
       {!disableCurrencySelect && onCurrencySelect && (
         <CurrencySearchModal
