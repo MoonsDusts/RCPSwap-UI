@@ -645,10 +645,7 @@ export function useXFusionSwap(): XFusionSwapType {
 
   return {
     error: isError,
-    loading:
-      isFetching ||
-      Boolean(isLoading && inputCurrencyId && outputCurrencyId && typedValue.length > 0 && +typedValue > 0) ||
-      Boolean(isInputLoading && inputCurrencyId && outputCurrencyId && typedValue.length > 0 && +typedValue > 0),
+    loading: isFetching || Boolean(isLoading && inputCurrencyId && outputCurrencyId && typedValue.length > 0 && +typedValue > 0) || Boolean(isInputLoading && inputCurrencyId && outputCurrencyId && typedValue.length > 0 && +typedValue > 0),
     currencies,
     parsedAmount,
     result: (data ?? {}) as any

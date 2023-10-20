@@ -1,5 +1,5 @@
 import { ChainId, CurrencyAmount, Fraction, JSBI, Percent, Token, TokenAmount, Trade } from '@rcpswap/sdk'
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useState, useRef } from 'react'
 import { ArrowDown, Repeat } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
@@ -178,24 +178,6 @@ export default function Swap() {
   const isValid = !swapInputError
   const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
 
-  const handleTypeInput = useCallback(
-    (value: string) => {
-      const index = value.indexOf('.')
-      if (index > -1 && value.length - index - 1 > (currencies[Field.INPUT]?.decimals ?? 10)) {
-        value = parseInt(value) + '.' + value.slice(index + 1, index + (currencies[Field.INPUT]?.decimals ?? 10) + 1)
-      }
-
-      onUserInput(Field.INPUT, value)
-    },
-    [onUserInput]
-  )
-  const handleTypeOutput = useCallback(
-    (value: string) => {
-      onUserInput(Field.OUTPUT, value)
-    },
-    [onUserInput]
-  )
-
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
     showConfirm: boolean
@@ -247,7 +229,6 @@ export default function Swap() {
   }, [approval, approvalSubmitted, swapMode])
 
   const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
-  const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
 
   // the callback to execute the swap
   const { callback: swapCallback, error: swapCallbackError } = useSwapCallback(trade, allowedSlippage, recipient)
@@ -397,6 +378,24 @@ export default function Swap() {
     singleHopOnly
   ])
 
+  const handleTypeInput = useCallback(
+    (value: string) => {
+      const index = value.indexOf('.')
+      if (index > -1 && value.length - index - 1 > (currencies[Field.INPUT]?.decimals ?? 10)) {
+        value = parseInt(value) + '.' + value.slice(index + 1, index + (currencies[Field.INPUT]?.decimals ?? 10) + 1)
+      }
+
+      onUserInput(Field.INPUT, value)
+    },
+    [onUserInput]
+  )
+  const handleTypeOutput = useCallback(
+    (value: string) => {
+      if (swapMode === 0) onUserInput(Field.OUTPUT, value)
+    },
+    [onUserInput, swapMode]
+  )
+
   // percentage slide
   const [percentageSlide, setPercentageSlide] = useState(0)
 
@@ -416,7 +415,7 @@ export default function Swap() {
         setPercentageSlide(Math.min(Math.floor(percenage * 100), 100))
       }
     }
-  }, [maxAmountInput, parsedAmounts[Field.INPUT]?.toExact()])
+  }, [maxAmountInput?.toExact(), parsedAmounts[Field.INPUT]?.toExact()])
 
   // show approve flow when: no error on inputs, not approved or pending, or approved in current session
   // never show if price impact is above threshold in non expert mode
@@ -474,9 +473,50 @@ export default function Swap() {
     [onCurrencySelection]
   )
 
-  const handlePercentageSlide = useCallback(
+  const slideTimerRef = useRef<number | null>(null)
+  const [tempInputValue, setTempInputValue] = useState(0)
+  const [percentageSliding, setPercentageSliding] = useState(false)
+
+  const handlePercentageSlideChange = useCallback(
     (step: number) => {
       setPercentageSlide(step)
+      setPercentageSliding(true)
+
+      if (slideTimerRef.current) {
+        clearTimeout(slideTimerRef.current)
+        slideTimerRef.current = null
+      }
+
+      slideTimerRef.current = (setTimeout(() => {
+        if (maxAmountInput) {
+          const particalAmount = maxAmountInput.multiply(step.toString()).divide('100')
+          const Big = toFormat(_Big)
+          Big.DP = maxAmountInput.currency.decimals
+          let value = new Big(particalAmount.numerator.toString())
+            .div(particalAmount.denominator.toString())
+            .toFormat({ groupSeparator: '' })
+
+          const index = value.indexOf('.')
+          if (index > -1 && value.length - index - 1 > (currencies[Field.INPUT]?.decimals ?? 10)) {
+            value =
+              parseInt(value) + '.' + value.slice(index + 1, index + (currencies[Field.INPUT]?.decimals ?? 10) + 1)
+          }
+          setTempInputValue(value)
+        }
+      }, 20) as unknown) as number
+    },
+    [maxAmountInput?.toExact(), setTempInputValue]
+  )
+
+  const handlePercentageSlideAfterChange = useCallback(
+    (step: number) => {
+      setPercentageSlide(step)
+      setPercentageSliding(false)
+
+      if (slideTimerRef.current) {
+        clearTimeout(slideTimerRef.current)
+        slideTimerRef.current = null
+      }
 
       if (maxAmountInput) {
         const particalAmount = maxAmountInput.multiply(step.toString()).divide('100')
@@ -493,7 +533,7 @@ export default function Swap() {
         onUserInput(Field.INPUT, value)
       }
     },
-    [maxAmountInput, onUserInput]
+    [maxAmountInput?.toExact(), onUserInput]
   )
 
   const handleOutputSelect = useCallback(outputCurrency => onCurrencySelection(Field.OUTPUT, outputCurrency), [
@@ -503,6 +543,34 @@ export default function Swap() {
   const swapIsUnsupported = useIsTransactionUnsupported(currencies?.INPUT, currencies?.OUTPUT)
 
   const isFusionFetching = swapMode === 1 && fusionSwap.loading && !account
+
+  const fusionSaving =
+    swapMode === 1 &&
+    fusionSwap &&
+    fusionSwap?.result &&
+    fusionSwap.result?.route &&
+    fusionSwap.result.route?.amountOut &&
+    fusionSwap.currencies?.OUTPUT &&
+    fusionSwap.result.route.fee?.amountOutBN
+      ? parseFloat(
+          new TokenAmount(
+            fusionSwap.currencies?.OUTPUT as Token,
+            ethers.BigNumber.from(fusionSwap.result.route.amountOutBN ?? '0').toString()
+          ).toExact()
+        ) -
+        parseFloat(
+          new TokenAmount(
+            fusionSwap.currencies?.OUTPUT as Token,
+            ethers.BigNumber.from(fusionSwap.result.route.fee.amountOutBN ?? '0').toString()
+          ).toExact()
+        ) -
+        parseFloat(
+          new TokenAmount(
+            fusionSwap.currencies.OUTPUT as Token,
+            ethers.BigNumber.from(fusionSwap.result.route.singleProviderRoute?.amountOutBN ?? '0').toString()
+          ).toExact()
+        )
+      : 0
 
   return (
     <>
@@ -534,7 +602,7 @@ export default function Swap() {
           <AutoColumn gap={'md'}>
             <CurrencyInputPanel
               label={independentField === Field.OUTPUT && !showWrap && trade ? 'From (estimated)' : 'From'}
-              value={formattedAmounts[Field.INPUT]}
+              value={percentageSliding ? tempInputValue : formattedAmounts[Field.INPUT]}
               currency={currencies[Field.INPUT]}
               onUserInput={handleTypeInput}
               onCurrencySelect={handleInputSelect}
@@ -543,7 +611,12 @@ export default function Swap() {
               outPrice={outputTokenPrice}
               id="swap-currency-input"
             />
-            <StepSlider step={percentageSlide} onChange={handlePercentageSlide} enabled={Boolean(maxAmountInput)} />
+            <StepSlider
+              step={percentageSlide}
+              onChange={handlePercentageSlideChange}
+              onAfterChange={handlePercentageSlideAfterChange}
+              enabled={Boolean(maxAmountInput)}
+            />
             <AutoColumn justify="space-between">
               <AutoRow justify={isExpertMode ? 'space-between' : 'center'} style={{ padding: '0 1rem' }}>
                 <ArrowWrapper clickable>
@@ -584,11 +657,12 @@ export default function Swap() {
               onCurrencySelect={handleOutputSelect}
               otherCurrency={currencies[Field.INPUT]}
               id="swap-currency-output"
-              disabled={swapMode === 1}
+              // disabled={swapMode === 1}
               inPrice={outputTokenPrice}
               outPrice={inputTokenPrice}
               showPriceImpact
               loading={swapMode === 1 && fusionSwap.loading}
+              saving={fusionSaving}
             />
 
             {recipient !== null && !showWrap ? (
