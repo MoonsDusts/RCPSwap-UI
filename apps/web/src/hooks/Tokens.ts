@@ -6,7 +6,6 @@ import {
   useCombinedActiveList,
   useCombinedInactiveList,
 } from "../state/lists/hooks"
-import { useUserAddedTokens } from "../state/user/hooks"
 import { useCustomTokens } from "@rcpswap/hooks"
 import { filterTokens } from "@rcpswap/wagmi"
 

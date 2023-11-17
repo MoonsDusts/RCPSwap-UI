@@ -1,15 +1,15 @@
-import React from "react";
-import { Text } from "rebass";
-import { ChainId } from "rcpswap/chain";
-import { Type, Token } from "rcpswap/currency";
-import styled from "styled-components";
+import React from "react"
+import { Text } from "rebass"
+import { ChainId } from "rcpswap/chain"
+import { Type, Token } from "rcpswap/currency"
+import styled from "styled-components"
 
-import { SUGGESTED_TOKEN_BASES } from "rcpswap";
-import { AutoColumn } from "../Column";
-import QuestionHelper from "../QuestionHelper";
-import { AutoRow } from "../Row";
-import CurrencyLogo from "../CurrencyLogo";
-import { defaultQuoteCurrency } from "rcpswap/currency";
+import { SUGGESTED_TOKEN_BASES } from "rcpswap"
+import { AutoColumn } from "../Column"
+import QuestionHelper from "../QuestionHelper"
+import { AutoRow } from "../Row"
+import CurrencyLogo from "../CurrencyLogo"
+import { defaultQuoteCurrency } from "rcpswap/currency"
 
 const BaseWrapper = styled.div<{ disable?: boolean }>`
   border: 1px solid
@@ -26,18 +26,18 @@ const BaseWrapper = styled.div<{ disable?: boolean }>`
 
   background-color: ${({ theme, disable }) => disable && theme.bg3};
   opacity: ${({ disable }) => disable && "0.4"};
-`;
+`
 
 export default function CommonBases({
   chainId,
   onSelect,
   selectedCurrency,
 }: {
-  chainId?: ChainId;
-  selectedCurrency?: Type | null;
-  onSelect: (currency: Type) => void;
+  chainId?: ChainId
+  selectedCurrency?: Type | null
+  onSelect: (currency: Type) => void
 }) {
-  const baseCurrency = chainId ? defaultQuoteCurrency[chainId] : undefined;
+  const baseCurrency = chainId ? defaultQuoteCurrency[chainId] : undefined
   return (
     <AutoColumn gap="md">
       <AutoRow>
@@ -53,7 +53,7 @@ export default function CommonBases({
               baseCurrency &&
               (!selectedCurrency || !selectedCurrency.equals(baseCurrency))
             ) {
-              onSelect(baseCurrency);
+              onSelect(baseCurrency)
             }
           }}
           disable={selectedCurrency === baseCurrency}
@@ -66,7 +66,7 @@ export default function CommonBases({
         {(chainId ? SUGGESTED_TOKEN_BASES[chainId] : []).map((token: Token) => {
           const selected =
             selectedCurrency instanceof Token &&
-            selectedCurrency.address === token.address;
+            selectedCurrency.address === token.address
           return (
             <BaseWrapper
               onClick={() => !selected && onSelect(token)}
@@ -78,9 +78,9 @@ export default function CommonBases({
                 {token.symbol}
               </Text>
             </BaseWrapper>
-          );
+          )
         })}
       </AutoRow>
     </AutoColumn>
-  );
+  )
 }

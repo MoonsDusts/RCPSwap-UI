@@ -1,12 +1,12 @@
-import React from "react";
-import styled, { css } from "styled-components";
-import { animated, useTransition } from "@react-spring/web";
-import { DialogOverlay, DialogContent } from "@reach/dialog";
-import { isMobile } from "react-device-detect";
-import "@reach/dialog/styles.css";
-import { transparentize } from "polished";
+import React from "react"
+import styled, { css } from "styled-components"
+import { animated, useTransition } from "@react-spring/web"
+import { DialogOverlay, DialogContent } from "@reach/dialog"
+import { isMobile } from "react-device-detect"
+import "@reach/dialog/styles.css"
+import { transparentize } from "polished"
 
-const AnimatedDialogOverlay = animated(DialogOverlay);
+const AnimatedDialogOverlay = animated(DialogOverlay)
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledDialogOverlay = styled(AnimatedDialogOverlay)`
   &[data-reach-dialog-overlay] {
@@ -20,9 +20,9 @@ const StyledDialogOverlay = styled(AnimatedDialogOverlay)`
 
     background-color: ${({ theme }) => theme.modalBG};
   }
-`;
+`
 
-const AnimatedDialogContent = animated(DialogContent);
+const AnimatedDialogContent = animated(DialogContent)
 // destructure to not pass custom props to Dialog DOM element
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledDialogContent = styled(
@@ -33,11 +33,11 @@ const StyledDialogContent = styled(
     isOpen,
     ...rest
   }: {
-    minHeight?: number | false;
-    maxHeight?: number;
-    mobile?: boolean;
-    isOpen?: boolean;
-    [k: string]: any;
+    minHeight?: number | false
+    maxHeight?: number
+    mobile?: boolean
+    isOpen?: boolean
+    [k: string]: any
   }) => <AnimatedDialogContent {...rest} />
 ).attrs({
   "aria-label": "dialog",
@@ -86,15 +86,15 @@ const StyledDialogContent = styled(
       }
     `}
   }
-`;
+`
 
 interface ModalProps {
-  isOpen: boolean;
-  onDismiss: () => void;
-  minHeight?: number | false;
-  maxHeight?: number;
-  initialFocusRef?: React.RefObject<any>;
-  children?: React.ReactNode;
+  isOpen: boolean
+  onDismiss: () => void
+  minHeight?: number | false
+  maxHeight?: number
+  initialFocusRef?: React.RefObject<any>
+  children?: React.ReactNode
 }
 
 export default function Modal({
@@ -110,7 +110,7 @@ export default function Modal({
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
-  });
+  })
 
   return (
     <>
@@ -136,5 +136,5 @@ export default function Modal({
           )
       )}
     </>
-  );
+  )
 }

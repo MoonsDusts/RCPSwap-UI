@@ -1,28 +1,28 @@
-import React, { useState } from "react";
-import { PaddedColumn, Separator } from "./styleds";
-import { RowBetween } from "@/components/Row";
-import { FiArrowLeft } from "react-icons/fi";
-import { Text } from "rebass";
-import { CloseIcon } from "@/theme";
-import styled from "styled-components";
-import { ChainId } from "rcpswap/chain";
-import { Token } from "rcpswap/currency";
-import { ManageLists } from "./ManageLists";
-import ManageTokens from "./ManageTokens";
-import { TokenList } from "@uniswap/token-lists";
-import { CurrencyModalView } from "./CurrencySearchModal";
+import React, { useState } from "react"
+import { PaddedColumn, Separator } from "./styleds"
+import { RowBetween } from "@/components/Row"
+import { FiArrowLeft } from "react-icons/fi"
+import { Text } from "rebass"
+import { CloseIcon } from "@/theme"
+import styled from "styled-components"
+import { ChainId } from "rcpswap/chain"
+import { Token } from "rcpswap/currency"
+import { ManageLists } from "./ManageLists"
+import ManageTokens from "./ManageTokens"
+import { TokenList } from "@uniswap/token-lists"
+import { CurrencyModalView } from "./CurrencySearchModal"
 
 const Wrapper = styled.div`
   width: 100%;
   position: relative;
   padding-bottom: 80px;
-`;
+`
 
 const ToggleWrapper = styled(RowBetween)`
   background-color: ${({ theme }) => theme.bg3};
   border-radius: 12px;
   padding: 6px;
-`;
+`
 
 const ToggleOption = styled.div<{ active?: boolean }>`
   width: 48%;
@@ -40,7 +40,7 @@ const ToggleOption = styled.div<{ active?: boolean }>`
     cursor: pointer;
     opacity: 0.7;
   }
-`;
+`
 
 export default function Manage({
   onDismiss,
@@ -50,15 +50,15 @@ export default function Manage({
   setListUrl,
   chainId,
 }: {
-  onDismiss: () => void;
-  setModalView: (view: CurrencyModalView) => void;
-  setImportToken: (token: Token) => void;
-  setImportList: (list: TokenList) => void;
-  setListUrl: (url: string) => void;
-  chainId?: ChainId;
+  onDismiss: () => void
+  setModalView: (view: CurrencyModalView) => void
+  setImportToken: (token: Token) => void
+  setImportList: (list: TokenList) => void
+  setListUrl: (url: string) => void
+  chainId?: ChainId
 }) {
   // toggle between tokens and lists
-  const [showLists, setShowLists] = useState(true);
+  const [showLists, setShowLists] = useState(true)
 
   return (
     <Wrapper>
@@ -105,5 +105,5 @@ export default function Manage({
         />
       )}
     </Wrapper>
-  );
+  )
 }

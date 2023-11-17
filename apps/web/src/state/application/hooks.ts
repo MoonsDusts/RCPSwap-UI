@@ -1,26 +1,40 @@
-import { useCallback, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, AppState } from '../index'
-import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal } from './actions'
-import { ChainId } from 'rcpswap/chain'
+import { useCallback, useMemo } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { AppDispatch, AppState } from "../index"
+import {
+  addPopup,
+  ApplicationModal,
+  PopupContent,
+  removePopup,
+  setOpenModal,
+} from "./actions"
+import { ChainId } from "rcpswap/chain"
 
 export function useBlockNumbers(): { [chainId: number]: number } {
   return useSelector((state: AppState) => state.application.blockNumber)
 }
 
 export function useBlockNumber(chainId?: ChainId): number | undefined {
-  return useSelector((state: AppState) => state.application.blockNumber[chainId ?? ChainId.ARBITRUM_NOVA])
+  return useSelector(
+    (state: AppState) =>
+      state.application.blockNumber[chainId ?? ChainId.ARBITRUM_NOVA]
+  )
 }
 
 export function useModalOpen(modal: ApplicationModal): boolean {
-  const openModal = useSelector((state: AppState) => state.application.openModal)
+  const openModal = useSelector(
+    (state: AppState) => state.application.openModal
+  )
   return openModal === modal
 }
 
 export function useToggleModal(modal: ApplicationModal): () => void {
   const open = useModalOpen(modal)
   const dispatch = useDispatch<AppDispatch>()
-  return useCallback(() => dispatch(setOpenModal(open ? null : modal)), [dispatch, modal, open])
+  return useCallback(
+    () => dispatch(setOpenModal(open ? null : modal)),
+    [dispatch, modal, open]
+  )
 }
 
 export function useOpenModal(modal: ApplicationModal): () => void {
@@ -85,7 +99,7 @@ export function useRemovePopup(): (key: string) => void {
 }
 
 // get the list of active popups
-export function useActivePopups(): AppState['application']['popupList'] {
+export function useActivePopups(): AppState["application"]["popupList"] {
   const list = useSelector((state: AppState) => state.application.popupList)
-  return useMemo(() => list.filter(item => item.show), [list])
+  return useMemo(() => list.filter((item) => item.show), [list])
 }

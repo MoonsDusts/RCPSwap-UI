@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "styled-components";
-import { StyledInternalLink } from "../../theme";
-import Image, { StaticImageData } from "next/image";
+import React from "react"
+import styled from "styled-components"
+import { StyledInternalLink } from "../../theme"
+import Image, { StaticImageData } from "next/image"
 
 const InfoCard = styled.button<{ active?: boolean }>`
   background-color: ${({ theme, active }) => (active ? theme.bg3 : theme.bg2)};
@@ -14,7 +14,7 @@ const InfoCard = styled.button<{ active?: boolean }>`
     box-shadow: 0 0 0 1px ${({ theme }) => theme.primary1};
   }
   border-color: ${({ theme, active }) => (active ? "transparent" : theme.bg3)};
-`;
+`
 
 const OptionCard = styled(InfoCard as any)`
   display: flex;
@@ -23,13 +23,13 @@ const OptionCard = styled(InfoCard as any)`
   justify-content: space-between;
   margin-top: 2rem;
   padding: 1rem;
-`;
+`
 
 const OptionCardLeft = styled.div`
   ${({ theme }) => theme.flexColumnNoWrap};
   justify-content: center;
   height: 100%;
-`;
+`
 
 const OptionCardClickable = styled(OptionCard as any)<{ clickable?: boolean }>`
   margin-top: 0;
@@ -39,7 +39,7 @@ const OptionCardClickable = styled(OptionCard as any)<{ clickable?: boolean }>`
       clickable ? `1px solid ${theme.primary1}` : ``};
   }
   opacity: ${({ disabled }) => (disabled ? "0.5" : "1")};
-`;
+`
 
 const GreenCircle = styled.div`
   ${({ theme }) => theme.flexRowNoWrap}
@@ -53,14 +53,14 @@ const GreenCircle = styled.div`
     background-color: ${({ theme }) => theme.green1};
     border-radius: 50%;
   }
-`;
+`
 
 const CircleWrapper = styled.div`
   color: ${({ theme }) => theme.green1};
   display: flex;
   justify-content: center;
   align-items: center;
-`;
+`
 
 const HeaderText = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
@@ -70,13 +70,13 @@ const HeaderText = styled.div`
       : ({ theme }) => theme.text1};
   font-size: 1rem;
   font-weight: 500;
-`;
+`
 
 const SubHeader = styled.div`
   color: ${({ theme }) => theme.text1};
   margin-top: 10px;
   font-size: 12px;
-`;
+`
 
 const IconWrapper = styled.div<{ size?: number | null }>`
   ${({ theme }) => theme.flexColumnNoWrap};
@@ -90,7 +90,7 @@ const IconWrapper = styled.div<{ size?: number | null }>`
   ${({ theme }) => theme.mediaWidth.upToMedium`
     align-items: flex-end;
   `};
-`;
+`
 
 export default function Option({
   link = null,
@@ -104,16 +104,16 @@ export default function Option({
   active = false,
   id,
 }: {
-  link?: string | null;
-  clickable?: boolean;
-  size?: number | null;
-  onClick?: null | (() => void);
-  color: string;
-  header: React.ReactNode;
-  subheader: React.ReactNode | null;
-  icon: StaticImageData;
-  active?: boolean;
-  id: string;
+  link?: string | null
+  clickable?: boolean
+  size?: number | null
+  onClick?: null | (() => void)
+  color: string
+  header: React.ReactNode
+  subheader: React.ReactNode | null
+  icon: StaticImageData
+  active?: boolean
+  id: string
 }) {
   const content = (
     <OptionCardClickable
@@ -146,14 +146,14 @@ export default function Option({
         />
       </IconWrapper>
     </OptionCardClickable>
-  );
+  )
   if (link) {
     return (
       <StyledInternalLink href={link} target="_blank" rel="noreferrer">
         {content}
       </StyledInternalLink>
-    );
+    )
   }
 
-  return content;
+  return content
 }

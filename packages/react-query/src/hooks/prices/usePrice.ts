@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { Fraction, ZERO } from "rcpswap/math"
+import { Fraction } from "rcpswap/math"
 import { parseUnits } from "viem"
 import { ChainId } from "rcpswap/chain"
 

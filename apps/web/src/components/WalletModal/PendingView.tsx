@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import React from "react";
-import styled from "styled-components";
-import Option from "./Option";
-import { darken } from "polished";
-import Loader from "../Loader";
-import { Connector } from "wagmi";
-import { SUPPORTED_CONNECTORS } from "@/config";
+import React from "react"
+import styled from "styled-components"
+import Option from "./Option"
+import { darken } from "polished"
+import Loader from "../Loader"
+import { Connector } from "wagmi"
+import { SUPPORTED_CONNECTORS } from "@/config"
 
 const PendingSection = styled.div`
   ${({ theme }) => theme.flexColumnNoWrap};
@@ -15,11 +15,11 @@ const PendingSection = styled.div`
   & > * {
     width: 100%;
   }
-`;
+`
 
 const StyledLoader = styled(Loader)`
   margin-right: 1rem;
-`;
+`
 
 const LoadingMessage = styled.div<{ error?: boolean }>`
   ${({ theme }) => theme.flexRowNoWrap};
@@ -33,13 +33,13 @@ const LoadingMessage = styled.div<{ error?: boolean }>`
   & > * {
     padding: 1rem;
   }
-`;
+`
 
 const ErrorGroup = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
   align-items: center;
   justify-content: flex-start;
-`;
+`
 
 const ErrorButton = styled.div`
   border-radius: 8px;
@@ -55,13 +55,13 @@ const ErrorButton = styled.div`
     cursor: pointer;
     background-color: ${({ theme }) => darken(0.1, theme.text4)};
   }
-`;
+`
 
 const LoadingWrapper = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
   align-items: center;
   justify-content: center;
-`;
+`
 
 export default function PendingView({
   connector,
@@ -69,10 +69,10 @@ export default function PendingView({
   setPendingError,
   tryActivation,
 }: {
-  connector?: Connector;
-  error?: boolean;
-  setPendingError: (error: boolean) => void;
-  tryActivation: (connector: Connector) => void;
+  connector?: Connector
+  error?: boolean
+  setPendingError: (error: boolean) => void
+  tryActivation: (connector: Connector) => void
 }) {
   return (
     <PendingSection>
@@ -83,8 +83,8 @@ export default function PendingView({
               <div>Error connecting.</div>
               <ErrorButton
                 onClick={() => {
-                  setPendingError(false);
-                  connector && tryActivation(connector);
+                  setPendingError(false)
+                  connector && tryActivation(connector)
                 }}
               >
                 Try Again
@@ -110,5 +110,5 @@ export default function PendingView({
         />
       )}
     </PendingSection>
-  );
+  )
 }

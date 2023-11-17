@@ -1,39 +1,39 @@
-import React, { useState } from "react";
-import { ChainId } from "rcpswap/chain";
-import { Type, Token } from "rcpswap/currency";
-import styled from "styled-components";
-import { TYPE, CloseIcon, StyledInternalLink } from "@/theme";
-import Card from "@/components/Card";
-import { AutoColumn } from "@/components/Column";
-import { RowBetween, RowFixed, AutoRow } from "@/components/Row";
-import CurrencyLogo from "@/components/CurrencyLogo";
-import { FiArrowLeft, FiAlertTriangle } from "react-icons/fi";
-import { transparentize } from "polished";
-import useTheme from "@/hooks/useTheme";
-import { ButtonPrimary } from "@/components/Button";
-import { SectionBreak } from "@/components/swap/styleds";
-import { getEtherscanLink } from "@rcpswap/wagmi";
-import { useCombinedInactiveList } from "@/state/lists/hooks";
-import Logo from "@/components/Logo";
-import { PaddedColumn, Checkbox } from "./styleds";
-import { useCustomTokens } from "@rcpswap/hooks";
+import React, { useState } from "react"
+import { ChainId } from "rcpswap/chain"
+import { Type, Token } from "rcpswap/currency"
+import styled from "styled-components"
+import { TYPE, CloseIcon, StyledInternalLink } from "@/theme"
+import Card from "@/components/Card"
+import { AutoColumn } from "@/components/Column"
+import { RowBetween, RowFixed, AutoRow } from "@/components/Row"
+import CurrencyLogo from "@/components/CurrencyLogo"
+import { FiArrowLeft, FiAlertTriangle } from "react-icons/fi"
+import { transparentize } from "polished"
+import useTheme from "@/hooks/useTheme"
+import { ButtonPrimary } from "@/components/Button"
+import { SectionBreak } from "@/components/swap/styleds"
+import { getEtherscanLink } from "@rcpswap/wagmi"
+import { useCombinedInactiveList } from "@/state/lists/hooks"
+import Logo from "@/components/Logo"
+import { PaddedColumn, Checkbox } from "./styleds"
+import { useCustomTokens } from "@rcpswap/hooks"
 
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
   overflow: auto;
-`;
+`
 
 const WarningWrapper = styled(Card)<{
-  highWarning: boolean;
-  borderRadius?: string;
+  highWarning: boolean
+  borderRadius?: string
 }>`
   background-color: ${({ theme, highWarning }) =>
     highWarning
       ? transparentize(0.8, theme.red1)
       : transparentize(0.8, theme.yellow2)};
   width: fit-content;
-`;
+`
 
 const AddressText = styled(TYPE.blue)`
   font-size: 12px;
@@ -41,18 +41,18 @@ const AddressText = styled(TYPE.blue)`
   ${({ theme }) => theme.mediaWidth.upToSmall`
     font-size: 10px;
 `}
-`;
+`
 
 const StyledLogo = styled(Logo)`
   width: 12px;
-`;
+`
 
 interface ImportProps {
-  tokens: Token[];
-  chainId?: ChainId;
-  onBack?: () => void;
-  onDismiss?: () => void;
-  handleCurrencySelect?: (currency: Type) => void;
+  tokens: Token[]
+  chainId?: ChainId
+  onBack?: () => void
+  onDismiss?: () => void
+  handleCurrencySelect?: (currency: Type) => void
 }
 
 export function ImportToken({
@@ -62,19 +62,19 @@ export function ImportToken({
   handleCurrencySelect,
   chainId,
 }: ImportProps) {
-  const theme = useTheme();
+  const theme = useTheme()
 
-  const [confirmed, setConfirmed] = useState(false);
+  const [confirmed, setConfirmed] = useState(false)
 
-  const addToken = useCustomTokens().mutate;
+  const addToken = useCustomTokens().mutate
 
   // use for showing import source on inactive tokens
-  const inactiveTokenList = useCombinedInactiveList();
+  const inactiveTokenList = useCombinedInactiveList()
 
   // higher warning severity if either is not on a list
   const fromLists =
     (chainId && inactiveTokenList?.[chainId]?.[tokens[0]?.address]?.list) ||
-    (chainId && inactiveTokenList?.[chainId]?.[tokens[1]?.address]?.list);
+    (chainId && inactiveTokenList?.[chainId]?.[tokens[1]?.address]?.list)
 
   return (
     <Wrapper>
@@ -95,7 +95,7 @@ export function ImportToken({
       <PaddedColumn gap="md">
         {tokens.map((token) => {
           const list =
-            chainId && inactiveTokenList?.[chainId]?.[token.address]?.list;
+            chainId && inactiveTokenList?.[chainId]?.[token.address]?.list
           return (
             <Card
               backgroundColor={theme?.bg2}
@@ -154,7 +154,7 @@ export function ImportToken({
                 )}
               </AutoColumn>
             </Card>
-          );
+          )
         })}
 
         <Card
@@ -226,8 +226,8 @@ export function ImportToken({
           borderRadius="20px"
           padding="10px 1rem"
           onClick={() => {
-            addToken("add", tokens);
-            handleCurrencySelect && handleCurrencySelect(tokens[0]);
+            addToken("add", tokens)
+            handleCurrencySelect && handleCurrencySelect(tokens[0])
           }}
           className=".token-dismiss-button"
         >
@@ -235,5 +235,5 @@ export function ImportToken({
         </ButtonPrimary>
       </PaddedColumn>
     </Wrapper>
-  );
+  )
 }

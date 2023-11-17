@@ -1,39 +1,33 @@
-import React, {
-  useRef,
-  RefObject,
-  useCallback,
-  useState,
-  useMemo,
-} from "react";
-import styled from "styled-components";
-import Column from "@/components/Column";
-import { PaddedColumn, Separator, SearchInput } from "./styleds";
-import Row, { RowBetween, RowFixed } from "@/components/Row";
+import React, { useRef, RefObject, useCallback, useState, useMemo } from "react"
+import styled from "styled-components"
+import Column from "@/components/Column"
+import { PaddedColumn, Separator, SearchInput } from "./styleds"
+import Row, { RowBetween, RowFixed } from "@/components/Row"
 import {
   TYPE,
   LinkIcon,
   TrashIcon,
   ButtonText,
   StyledInternalLink,
-} from "@/theme";
+} from "@/theme"
 
-import { ChainId } from "rcpswap/chain";
-import { Token } from "rcpswap/currency";
-import CurrencyLogo from "@/components/CurrencyLogo";
-import { getEtherscanLink, isAddress, useTokenWithCache } from "@rcpswap/wagmi";
-import Card from "@/components/Card";
-import ImportRow from "./ImportRow";
-import useTheme from "@/hooks/useTheme";
+import { ChainId } from "rcpswap/chain"
+import { Token } from "rcpswap/currency"
+import CurrencyLogo from "@/components/CurrencyLogo"
+import { getEtherscanLink, isAddress, useTokenWithCache } from "@rcpswap/wagmi"
+import Card from "@/components/Card"
+import ImportRow from "./ImportRow"
+import useTheme from "@/hooks/useTheme"
 
-import { CurrencyModalView } from "./CurrencySearchModal";
-import { useCustomTokens } from "@rcpswap/hooks";
+import { CurrencyModalView } from "./CurrencySearchModal"
+import { useCustomTokens } from "@rcpswap/hooks"
 
 const Wrapper = styled.div`
   width: 100%;
   height: calc(100% - 60px);
   position: relative;
   padding-bottom: 60px;
-`;
+`
 
 const Footer = styled.div`
   position: absolute;
@@ -45,48 +39,48 @@ const Footer = styled.div`
   border-top: 1px solid ${({ theme }) => theme.bg3};
   padding: 20px;
   text-align: center;
-`;
+`
 
 export default function ManageTokens({
   setModalView,
   setImportToken,
   chainId,
 }: {
-  setModalView: (view: CurrencyModalView) => void;
-  setImportToken: (token: Token) => void;
-  chainId?: ChainId;
+  setModalView: (view: CurrencyModalView) => void
+  setImportToken: (token: Token) => void
+  chainId?: ChainId
 }) {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const theme = useTheme();
+  const [searchQuery, setSearchQuery] = useState<string>("")
+  const theme = useTheme()
 
   // manage focus on modal show
-  const inputRef = useRef<HTMLInputElement>();
+  const inputRef = useRef<HTMLInputElement>()
   const handleInput = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const input = event.target.value;
-      const checksummedInput = isAddress(input);
-      setSearchQuery(checksummedInput || input);
+      const input = event.target.value
+      const checksummedInput = isAddress(input)
+      setSearchQuery(checksummedInput || input)
     },
     []
-  );
+  )
 
   // if they input an address, use it
-  const isAddressSearch = isAddress(searchQuery);
+  const isAddressSearch = isAddress(searchQuery)
   const { data: searchToken } = useTokenWithCache({
     chainId: chainId,
     address: searchQuery,
-  });
+  })
 
   // all tokens for local lisr
-  const { data: addedTokenMap, mutate: removeToken } = useCustomTokens();
+  const { data: addedTokenMap, mutate: removeToken } = useCustomTokens()
 
-  const userAddedTokens = addedTokenMap ? Object.values(addedTokenMap) : [];
+  const userAddedTokens = addedTokenMap ? Object.values(addedTokenMap) : []
 
   const handleRemoveAll = useCallback(() => {
     if (chainId && userAddedTokens) {
-      return removeToken("remove", userAddedTokens);
+      return removeToken("remove", userAddedTokens)
     }
-  }, [removeToken, userAddedTokens, chainId]);
+  }, [removeToken, userAddedTokens, chainId])
 
   const tokenList = useMemo(() => {
     return (
@@ -117,8 +111,8 @@ export default function ManageTokens({
           </RowFixed>
         </RowBetween>
       ))
-    );
-  }, [userAddedTokens, chainId, removeToken]);
+    )
+  }, [userAddedTokens, chainId, removeToken])
 
   return (
     <Wrapper>
@@ -173,5 +167,5 @@ export default function ManageTokens({
         </TYPE.darkGray>
       </Footer>
     </Wrapper>
-  );
+  )
 }

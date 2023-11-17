@@ -1,4 +1,3 @@
-import { ChainId } from "rcpswap/chain"
 import { type SerializableTransactionReceipt } from "./types"
 
 import { db } from "../db"

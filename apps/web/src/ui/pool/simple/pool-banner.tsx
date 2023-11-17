@@ -5,7 +5,7 @@ import {
   CardNoise,
   CardSection,
   DataCard,
-} from "@/components/earn/styled"
+} from "@/components/styled"
 import { AutoColumn } from "@/components/Column"
 import { RowBetween } from "@/components/Row"
 import { TYPE } from "@/theme"

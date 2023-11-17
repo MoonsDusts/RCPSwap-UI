@@ -1,10 +1,17 @@
-import { DEFAULT_ACTIVE_LIST_URLS } from 'rcpswap'
-import { createReducer } from '@reduxjs/toolkit'
-import { getVersionUpgrade, VersionUpgrade } from '@uniswap/token-lists'
-import { TokenList } from '@uniswap/token-lists/dist/types'
-import { DEFAULT_LIST_OF_LISTS } from 'rcpswap'
-import { updateVersion } from '../global/actions'
-import { acceptListUpdate, addList, fetchTokenList, removeList, enableList, disableList } from './actions'
+import { DEFAULT_ACTIVE_LIST_URLS } from "rcpswap"
+import { createReducer } from "@reduxjs/toolkit"
+import { getVersionUpgrade, VersionUpgrade } from "@uniswap/token-lists"
+import { TokenList } from "@uniswap/token-lists/dist/types"
+import { DEFAULT_LIST_OF_LISTS } from "rcpswap"
+import { updateVersion } from "../global/actions"
+import {
+  acceptListUpdate,
+  addList,
+  fetchTokenList,
+  removeList,
+  enableList,
+  disableList,
+} from "./actions"
 
 export interface ListsState {
   readonly byUrl: {
@@ -22,84 +29,101 @@ export interface ListsState {
   readonly activeListUrls: string[] | undefined
 }
 
-type ListState = ListsState['byUrl'][string]
+type ListState = ListsState["byUrl"][string]
 
 const NEW_LIST_STATE: ListState = {
   error: null,
   current: null,
   loadingRequestId: null,
-  pendingUpdate: null
+  pendingUpdate: null,
 }
 
-type Mutable<T> = { -readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U> ? U[] : T[P] }
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P] extends ReadonlyArray<infer U> ? U[] : T[P]
+}
 
 const initialState: ListsState = {
   lastInitializedDefaultListOfLists: DEFAULT_LIST_OF_LISTS,
   byUrl: {
-    ...DEFAULT_LIST_OF_LISTS.reduce<Mutable<ListsState['byUrl']>>((memo, listUrl) => {
-      memo[listUrl] = NEW_LIST_STATE
-      return memo
-    }, {})
+    ...DEFAULT_LIST_OF_LISTS.reduce<Mutable<ListsState["byUrl"]>>(
+      (memo, listUrl) => {
+        memo[listUrl] = NEW_LIST_STATE
+        return memo
+      },
+      {}
+    ),
   },
-  activeListUrls: DEFAULT_ACTIVE_LIST_URLS
+  activeListUrls: DEFAULT_ACTIVE_LIST_URLS,
 }
 
-export default createReducer(initialState, builder =>
+export default createReducer(initialState, (builder) =>
   builder
-    .addCase(fetchTokenList.pending, (state, { payload: { requestId, url } }) => {
-      state.byUrl[url] = {
-        ...state.byUrl[url],
-        loadingRequestId: requestId,
-        error: null
+    .addCase(
+      fetchTokenList.pending,
+      (state, { payload: { requestId, url } }) => {
+        state.byUrl[url] = {
+          ...state.byUrl[url],
+          loadingRequestId: requestId,
+          error: null,
+        }
       }
-    })
-    .addCase(fetchTokenList.fulfilled, (state, { payload: { requestId, tokenList, url } }) => {
-      const current = state.byUrl[url]?.current
-      const loadingRequestId = state.byUrl[url]?.loadingRequestId
+    )
+    .addCase(
+      fetchTokenList.fulfilled,
+      (state, { payload: { requestId, tokenList, url } }) => {
+        const current = state.byUrl[url]?.current
+        const loadingRequestId = state.byUrl[url]?.loadingRequestId
 
-      // no-op if update does nothing
-      if (current) {
-        const upgradeType = getVersionUpgrade(current.version, tokenList.version)
+        // no-op if update does nothing
+        if (current) {
+          const upgradeType = getVersionUpgrade(
+            current.version,
+            tokenList.version
+          )
 
-        if (upgradeType === VersionUpgrade.NONE) return
-        if (loadingRequestId === null || loadingRequestId === requestId) {
+          if (upgradeType === VersionUpgrade.NONE) return
+          if (loadingRequestId === null || loadingRequestId === requestId) {
+            state.byUrl[url] = {
+              ...state.byUrl[url],
+              loadingRequestId: null,
+              error: null,
+              current: current,
+              pendingUpdate: tokenList,
+            }
+          }
+        } else {
+          // activate if on default active
+          if (DEFAULT_ACTIVE_LIST_URLS.includes(url)) {
+            state.activeListUrls?.push(url)
+          }
+
           state.byUrl[url] = {
             ...state.byUrl[url],
             loadingRequestId: null,
             error: null,
-            current: current,
-            pendingUpdate: tokenList
+            current: tokenList,
+            pendingUpdate: null,
           }
         }
-      } else {
-        // activate if on default active
-        if (DEFAULT_ACTIVE_LIST_URLS.includes(url)) {
-          state.activeListUrls?.push(url)
+      }
+    )
+    .addCase(
+      fetchTokenList.rejected,
+      (state, { payload: { url, requestId, errorMessage } }) => {
+        if (state.byUrl[url]?.loadingRequestId !== requestId) {
+          // no-op since it's not the latest request
+          return
         }
 
         state.byUrl[url] = {
           ...state.byUrl[url],
           loadingRequestId: null,
-          error: null,
-          current: tokenList,
-          pendingUpdate: null
+          error: errorMessage,
+          current: null,
+          pendingUpdate: null,
         }
       }
-    })
-    .addCase(fetchTokenList.rejected, (state, { payload: { url, requestId, errorMessage } }) => {
-      if (state.byUrl[url]?.loadingRequestId !== requestId) {
-        // no-op since it's not the latest request
-        return
-      }
-
-      state.byUrl[url] = {
-        ...state.byUrl[url],
-        loadingRequestId: null,
-        error: errorMessage,
-        current: null,
-        pendingUpdate: null
-      }
-    })
+    )
     .addCase(addList, (state, { payload: url }) => {
       if (!state.byUrl[url]) {
         state.byUrl[url] = NEW_LIST_STATE
@@ -111,7 +135,7 @@ export default createReducer(initialState, builder =>
       }
       // remove list from active urls if needed
       if (state.activeListUrls && state.activeListUrls.includes(url)) {
-        state.activeListUrls = state.activeListUrls.filter(u => u !== url)
+        state.activeListUrls = state.activeListUrls.filter((u) => u !== url)
       }
     })
     .addCase(enableList, (state, { payload: url }) => {
@@ -129,38 +153,42 @@ export default createReducer(initialState, builder =>
     })
     .addCase(disableList, (state, { payload: url }) => {
       if (state.activeListUrls && state.activeListUrls.includes(url)) {
-        state.activeListUrls = state.activeListUrls.filter(u => u !== url)
+        state.activeListUrls = state.activeListUrls.filter((u) => u !== url)
       }
     })
     .addCase(acceptListUpdate, (state, { payload: url }) => {
       if (!state.byUrl[url]?.pendingUpdate) {
-        throw new Error('accept list update called without pending update')
+        throw new Error("accept list update called without pending update")
       }
       state.byUrl[url] = {
         ...state.byUrl[url],
         pendingUpdate: null,
-        current: state.byUrl[url].pendingUpdate
+        current: state.byUrl[url].pendingUpdate,
       }
     })
-    .addCase(updateVersion, state => {
+    .addCase(updateVersion, (state) => {
       // state loaded from localStorage, but new lists have never been initialized
       if (!state.lastInitializedDefaultListOfLists) {
         state.byUrl = initialState.byUrl
         state.activeListUrls = initialState.activeListUrls
       } else if (state.lastInitializedDefaultListOfLists) {
-        const lastInitializedSet = state.lastInitializedDefaultListOfLists.reduce<Set<string>>(
+        const lastInitializedSet =
+          state.lastInitializedDefaultListOfLists.reduce<Set<string>>(
+            (s, l) => s.add(l),
+            new Set()
+          )
+        const newListOfListsSet = DEFAULT_LIST_OF_LISTS.reduce<Set<string>>(
           (s, l) => s.add(l),
           new Set()
         )
-        const newListOfListsSet = DEFAULT_LIST_OF_LISTS.reduce<Set<string>>((s, l) => s.add(l), new Set())
 
-        DEFAULT_LIST_OF_LISTS.forEach(listUrl => {
+        DEFAULT_LIST_OF_LISTS.forEach((listUrl) => {
           if (!lastInitializedSet.has(listUrl)) {
             state.byUrl[listUrl] = NEW_LIST_STATE
           }
         })
 
-        state.lastInitializedDefaultListOfLists.forEach(listUrl => {
+        state.lastInitializedDefaultListOfLists.forEach((listUrl) => {
           if (!newListOfListsSet.has(listUrl)) {
             delete state.byUrl[listUrl]
           }

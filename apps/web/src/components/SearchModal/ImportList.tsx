@@ -1,41 +1,41 @@
-import React, { useState, useCallback } from "react";
-import styled from "styled-components";
-import { TYPE, CloseIcon } from "@/theme";
-import Card from "@/components/Card";
-import { AutoColumn } from "@/components/Column";
-import { RowBetween, RowFixed, AutoRow } from "@/components/Row";
-import { FiArrowLeft, FiAlertTriangle } from "react-icons/fi";
-import useTheme from "@/hooks/useTheme";
-import { transparentize } from "polished";
-import { ButtonPrimary } from "@/components/Button";
-import { SectionBreak } from "@/components/swap/styleds";
-import { StyledInternalLink } from "@/theme/components";
-import Logo from "@/components/Logo";
-import { PaddedColumn, Checkbox, TextDot } from "./styleds";
-import { TokenList } from "@uniswap/token-lists";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/state";
-import { useFetchListCallback } from "@/hooks/useFetchListCallback";
-import { removeList, enableList } from "@/state/lists/actions";
-import { CurrencyModalView } from "./CurrencySearchModal";
-import { useAllLists } from "@/state/lists/hooks";
+import React, { useState, useCallback } from "react"
+import styled from "styled-components"
+import { TYPE, CloseIcon } from "@/theme"
+import Card from "@/components/Card"
+import { AutoColumn } from "@/components/Column"
+import { RowBetween, RowFixed, AutoRow } from "@/components/Row"
+import { FiArrowLeft, FiAlertTriangle } from "react-icons/fi"
+import useTheme from "@/hooks/useTheme"
+import { transparentize } from "polished"
+import { ButtonPrimary } from "@/components/Button"
+import { SectionBreak } from "@/components/swap/styleds"
+import { StyledInternalLink } from "@/theme/components"
+import Logo from "@/components/Logo"
+import { PaddedColumn, Checkbox, TextDot } from "./styleds"
+import { TokenList } from "@uniswap/token-lists"
+import { useDispatch } from "react-redux"
+import { AppDispatch } from "@/state"
+import { useFetchListCallback } from "@/hooks/useFetchListCallback"
+import { removeList, enableList } from "@/state/lists/actions"
+import { CurrencyModalView } from "./CurrencySearchModal"
+import { useAllLists } from "@/state/lists/hooks"
 
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
   overflow: auto;
-`;
+`
 
 const StyledLogo = styled(Logo)`
   width: 40px;
   height: 40px;
-`;
+`
 
 interface ImportProps {
-  listURL: string;
-  list: TokenList;
-  onDismiss: () => void;
-  setModalView: (view: CurrencyModalView) => void;
+  listURL: string
+  list: TokenList
+  onDismiss: () => void
+  setModalView: (view: CurrencyModalView) => void
 }
 
 export function ImportList({
@@ -44,34 +44,34 @@ export function ImportList({
   setModalView,
   onDismiss,
 }: ImportProps) {
-  const theme = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme()
+  const dispatch = useDispatch<AppDispatch>()
 
   // user must accept
-  const [confirmed, setConfirmed] = useState(false);
+  const [confirmed, setConfirmed] = useState(false)
 
-  const lists = useAllLists();
-  const fetchList = useFetchListCallback();
+  const lists = useAllLists()
+  const fetchList = useFetchListCallback()
 
   // monitor is list is loading
-  const adding = Boolean(lists[listURL]?.loadingRequestId);
-  const [addError, setAddError] = useState<string | null>(null);
+  const adding = Boolean(lists[listURL]?.loadingRequestId)
+  const [addError, setAddError] = useState<string | null>(null)
 
   const handleAddList = useCallback(() => {
-    if (adding) return;
-    setAddError(null);
+    if (adding) return
+    setAddError(null)
     fetchList(listURL)
       .then(() => {
         // turn list on
-        dispatch(enableList(listURL));
+        dispatch(enableList(listURL))
         // go back to lists
-        setModalView(CurrencyModalView.manage);
+        setModalView(CurrencyModalView.manage)
       })
       .catch((error) => {
-        setAddError(error.message);
-        dispatch(removeList(listURL));
-      });
-  }, [adding, dispatch, fetchList, listURL, setModalView]);
+        setAddError(error.message)
+        dispatch(removeList(listURL))
+      })
+  }, [adding, dispatch, fetchList, listURL, setModalView])
 
   return (
     <Wrapper>
@@ -200,5 +200,5 @@ export function ImportList({
         {/* </Card> */}
       </PaddedColumn>
     </Wrapper>
-  );
+  )
 }

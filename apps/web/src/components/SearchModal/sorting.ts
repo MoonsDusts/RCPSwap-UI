@@ -1,16 +1,20 @@
-import { Token, Amount, Type } from 'rcpswap/currency'
-import { useMemo } from 'react'
-import { useAccount, useBalancesWeb3 } from '@rcpswap/wagmi'
-import { useAllTokens } from '@/hooks/Tokens'
-import { ChainId } from 'rcpswap/chain'
+import { Token, Amount, Type } from "rcpswap/currency"
+import { useMemo } from "react"
+import { useAccount, useBalancesWeb3 } from "@rcpswap/wagmi"
+import { useAllTokens } from "@/hooks/Tokens"
+import { ChainId } from "rcpswap/chain"
 
 // compare two token amounts with highest one coming first
 function balanceComparator(balanceA?: Amount<Type>, balanceB?: Amount<Type>) {
   if (balanceA && balanceB) {
-    return balanceA.greaterThan(balanceB) ? -1 : balanceA.equalTo(balanceB) ? 0 : 1
-  } else if (balanceA && balanceA.greaterThan('0')) {
+    return balanceA.greaterThan(balanceB)
+      ? -1
+      : balanceA.equalTo(balanceB)
+      ? 0
+      : 1
+  } else if (balanceA && balanceA.greaterThan("0")) {
     return -1
-  } else if (balanceB && balanceB.greaterThan('0')) {
+  } else if (balanceB && balanceB.greaterThan("0")) {
     return 1
   }
   return 0
@@ -39,11 +43,21 @@ function getTokenComparator(balances: {
   }
 }
 
-export function useTokenComparator(chainId: ChainId, inverted: boolean): (tokenA: Token, tokenB: Token) => number {
+export function useTokenComparator(
+  chainId: ChainId,
+  inverted: boolean
+): (tokenA: Token, tokenB: Token) => number {
   const { address } = useAccount()
   const allTokens = useAllTokens()
-  const { data: balances } = useBalancesWeb3({ chainId, currencies: Object.values(allTokens), account: address })
-  const comparator = useMemo(() => getTokenComparator(balances ?? {}), [balances])
+  const { data: balances } = useBalancesWeb3({
+    chainId,
+    currencies: Object.values(allTokens),
+    account: address,
+  })
+  const comparator = useMemo(
+    () => getTokenComparator(balances ?? {}),
+    [balances]
+  )
   return useMemo(() => {
     if (inverted) {
       return (tokenA: Token, tokenB: Token) => comparator(tokenA, tokenB) * -1

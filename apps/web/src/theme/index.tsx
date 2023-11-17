@@ -1,38 +1,38 @@
-import { transparentize } from "polished";
-import React, { useMemo } from "react";
+import { transparentize } from "polished"
+import React, { useMemo } from "react"
 import styled, {
   ThemeProvider as StyledComponentsThemeProvider,
   createGlobalStyle,
   css,
   DefaultTheme,
-} from "styled-components";
-import { Text, TextProps } from "rebass";
-import { Colors } from "./styled";
+} from "styled-components"
+import { Text, TextProps } from "rebass"
+import { Colors } from "./styled"
 
-import { useDarkMode } from "@rcpswap/hooks";
+import { useDarkMode } from "@rcpswap/hooks"
 
-export * from "./components";
+export * from "./components"
 
 const MEDIA_WIDTHS = {
   upToExtraSmall: 500,
   upToSmall: 720,
   upToMedium: 960,
   upToLarge: 1280,
-};
+}
 
 const mediaWidthTemplates: {
-  [width in keyof typeof MEDIA_WIDTHS]: typeof css;
+  [width in keyof typeof MEDIA_WIDTHS]: typeof css
 } = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
-  (accumulator as any)[size] = (a: any, b: any, c: any) => css`
+  ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
     @media (max-width: ${(MEDIA_WIDTHS as any)[size]}px) {
       ${css(a, b, c)}
     }
-  `;
-  return accumulator;
-}, {}) as any;
+  `
+  return accumulator
+}, {}) as any
 
-const white = "#FFFFFF";
-const black = "#000000";
+const white = "#FFFFFF"
+const black = "#000000"
 
 export function colors(darkMode: boolean): Colors {
   return {
@@ -93,7 +93,7 @@ export function colors(darkMode: boolean): Colors {
     tokenButtonGradientEnd: "#005224",
     customCardGradientStart: "#3e8ded",
     customCardGradientEnd: "#2172E5",
-  };
+  }
 }
 
 export function theme(darkMode: boolean): DefaultTheme {
@@ -115,70 +115,70 @@ export function theme(darkMode: boolean): DefaultTheme {
       display: flex;
       flex-flow: row nowrap;
     `,
-  };
+  }
 }
 
 export default function ThemeProvider({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const { darkMode } = useDarkMode();
+  const { darkMode } = useDarkMode()
 
-  const themeObject = useMemo(() => theme(darkMode), [darkMode]);
+  const themeObject = useMemo(() => theme(darkMode), [darkMode])
 
   return (
     <StyledComponentsThemeProvider theme={themeObject}>
       {children}
     </StyledComponentsThemeProvider>
-  );
+  )
 }
 
 const TextWrapper = styled(Text)<{ color: keyof Colors }>`
   color: ${({ color, theme }) => (theme as any)[color]};
-`;
+`
 
 export const TYPE = {
   main(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={"text2"} {...props} />;
+    return <TextWrapper fontWeight={500} color={"text2"} {...props} />
   },
   link(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={"primary1"} {...props} />;
+    return <TextWrapper fontWeight={500} color={"primary1"} {...props} />
   },
   black(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={"text1"} {...props} />;
+    return <TextWrapper fontWeight={500} color={"text1"} {...props} />
   },
   white(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={"white"} {...props} />;
+    return <TextWrapper fontWeight={500} color={"white"} {...props} />
   },
   body(props: TextProps) {
     return (
       <TextWrapper fontWeight={400} fontSize={16} color={"text1"} {...props} />
-    );
+    )
   },
   largeHeader(props: TextProps) {
-    return <TextWrapper fontWeight={600} fontSize={24} {...props} />;
+    return <TextWrapper fontWeight={600} fontSize={24} {...props} />
   },
   mediumHeader(props: TextProps) {
-    return <TextWrapper fontWeight={500} fontSize={20} {...props} />;
+    return <TextWrapper fontWeight={500} fontSize={20} {...props} />
   },
   subHeader(props: TextProps) {
-    return <TextWrapper fontWeight={400} fontSize={14} {...props} />;
+    return <TextWrapper fontWeight={400} fontSize={14} {...props} />
   },
   small(props: TextProps) {
-    return <TextWrapper fontWeight={500} fontSize={11} {...props} />;
+    return <TextWrapper fontWeight={500} fontSize={11} {...props} />
   },
   blue(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={"blue1"} {...props} />;
+    return <TextWrapper fontWeight={500} color={"blue1"} {...props} />
   },
   yellow(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={"yellow1"} {...props} />;
+    return <TextWrapper fontWeight={500} color={"yellow1"} {...props} />
   },
   darkGray(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={"text3"} {...props} />;
+    return <TextWrapper fontWeight={500} color={"text3"} {...props} />
   },
   gray(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={"bg3"} {...props} />;
+    return <TextWrapper fontWeight={500} color={"bg3"} {...props} />
   },
   italic(props: TextProps) {
     return (
@@ -189,7 +189,7 @@ export const TYPE = {
         color={"text2"}
         {...props}
       />
-    );
+    )
   },
   error({ error, ...props }: { error: boolean } & TextProps) {
     return (
@@ -198,9 +198,9 @@ export const TYPE = {
         color={error ? "red1" : "text2"}
         {...props}
       />
-    );
+    )
   },
-};
+}
 
 export const FixedGlobalStyle = createGlobalStyle`
 html, input, textarea, button {
@@ -239,7 +239,7 @@ html {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   font-feature-settings: 'ss01' on, 'ss02' on, 'cv01' on, 'cv03' on;
 }
-`;
+`
 
 export const ThemedGlobalStyle = createGlobalStyle`
 html {
@@ -257,4 +257,4 @@ body {
       theme.primary1
     )} 0%, ${transparentize(1, theme.bg1)} 100%)`};
 }
-`;
+`

@@ -7,8 +7,12 @@ import { Percent } from "rcpswap"
 import { AutoColumn } from "@/components/Column"
 import { AutoRow } from "@/components/Row"
 import { ONE_BIPS } from "rcpswap"
-import { Field } from "@/state/mint/actions"
 import { TYPE } from "@/theme"
+
+export enum Field {
+  CURRENCY_A = "CURRENCY_A",
+  CURRENCY_B = "CURRENCY_B",
+}
 
 export function PoolPriceBar({
   currencies,

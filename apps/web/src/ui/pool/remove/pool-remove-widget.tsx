@@ -25,7 +25,7 @@ import CurrencyLogo from "@/components/CurrencyLogo"
 
 import { StyledInternalLink, TYPE } from "@/theme"
 
-import useDebouncedChangeHandler from "@/utils1/useDebouncedChangeHandler"
+import useDebouncedChangeHandler from "@/utils/useDebouncedChangeHandler"
 import {
   Dots,
   ClickableText,

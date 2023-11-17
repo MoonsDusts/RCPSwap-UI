@@ -1,4 +1,7 @@
-import { FlattenSimpleInterpolation, ThemedCssFunction } from 'styled-components'
+import {
+  FlattenSimpleInterpolation,
+  ThemedCssFunction,
+} from "styled-components"
 
 export type Color = string
 export interface Colors {
@@ -55,7 +58,7 @@ export interface Colors {
   customCardGradientEnd: Color
 }
 
-declare module 'styled-components' {
+declare module "styled-components" {
   export interface DefaultTheme extends Colors {
     // shadows
     shadow1: string

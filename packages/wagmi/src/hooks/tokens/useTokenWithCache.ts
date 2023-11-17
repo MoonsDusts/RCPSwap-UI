@@ -1,11 +1,11 @@
-import { useCustomTokens } from '@rcpswap/hooks'
-import { useQuery } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { ChainId } from 'rcpswap/chain'
-import { Token } from 'rcpswap/currency'
-import { isAddress } from 'viem'
-import { Address } from 'wagmi'
-import { fetchToken } from 'wagmi/actions'
+import { useCustomTokens } from "@rcpswap/hooks"
+import { useQuery } from "@tanstack/react-query"
+import { useCallback } from "react"
+import { ChainId } from "rcpswap/chain"
+import { Token } from "rcpswap/currency"
+import { isAddress } from "viem"
+import { Address } from "wagmi"
+import { fetchToken } from "wagmi/actions"
 
 interface UseTokenParams<T extends boolean> {
   chainId: ChainId | undefined
@@ -16,7 +16,7 @@ interface UseTokenParams<T extends boolean> {
 }
 
 type UseTokenReturn<T> = T extends true
-  ? { token: Token; status: 'UNKNOWN' | 'APPROVED' | 'DISAPPROVED' }
+  ? { token: Token; status: "UNKNOWN" | "APPROVED" | "DISAPPROVED" }
   : Token
 
 type Data = {
@@ -25,13 +25,13 @@ type Data = {
   name: string
   symbol: string
   decimals: number
-  status: 'UNKNOWN' | 'APPROVED' | 'DISAPPROVED'
+  status: "UNKNOWN" | "APPROVED" | "DISAPPROVED"
 }
 
 export const getTokenWithQueryCacheHydrate = <T extends boolean>(
   chainId: ChainId | undefined,
   data: Data,
-  withStatus: T | undefined,
+  withStatus: T | undefined
 ): UseTokenReturn<T> | undefined => {
   if (data && chainId) {
     const { address, name, symbol, decimals } = data
@@ -84,7 +84,7 @@ export const getTokenWithCacheQueryFn = async ({
       name,
       symbol,
       decimals,
-      status: 'UNKNOWN',
+      status: "UNKNOWN",
       id,
     } as Data
   }
@@ -107,11 +107,11 @@ export const getTokenWithCacheQueryFn = async ({
       name,
       symbol,
       decimals,
-      status: 'UNKNOWN',
+      status: "UNKNOWN",
       id: `${chainId}:${tokenAddress}`,
     } as Data
   } else {
-    throw Error('Could not fetch token')
+    throw Error("Could not fetch token")
   }
 }
 
@@ -125,12 +125,14 @@ export const useTokenWithCache = <T extends boolean = false>({
   const { data: customTokens, hasToken } = useCustomTokens()
   const select = useCallback(
     (data: Data) => getTokenWithQueryCacheHydrate<T>(chainId, data, withStatus),
-    [chainId, withStatus],
+    [chainId, withStatus]
   )
 
   return useQuery({
-    queryKey: ['token', chainId, address],
-    queryFn: async () => getTokenWithCacheQueryFn({ chainId, address, customTokens, hasToken }),
+    //@ts-ignore
+    queryKey: ["token", chainId, address],
+    queryFn: async () =>
+      getTokenWithCacheQueryFn({ chainId, address, customTokens, hasToken }),
     enabled: Boolean(enabled && chainId && address),
     select,
     keepPreviousData,

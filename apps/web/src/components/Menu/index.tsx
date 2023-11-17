@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef } from "react"
 import {
   FaReddit,
   FaTelegramPlane,
@@ -7,13 +7,13 @@ import {
   FaTwitter,
   FaRegChartBar,
   FaGlobe,
-} from "react-icons/fa";
-import styled from "styled-components";
-import MenuSVG from "../svgs/Menu";
-import { useOnClickOutside } from "@rcpswap/hooks";
-import { ApplicationModal } from "../../state/application/actions";
-import { useModalOpen, useToggleModal } from "../../state/application/hooks";
-import Link from "next/link";
+} from "react-icons/fa"
+import styled from "styled-components"
+import MenuSVG from "../svgs/Menu"
+import { useOnClickOutside } from "@rcpswap/hooks"
+import { ApplicationModal } from "../../state/application/actions"
+import { useModalOpen, useToggleModal } from "../../state/application/hooks"
+import Link from "next/link"
 
 const StyledMenuButton = styled.button`
   width: 100%;
@@ -39,7 +39,7 @@ const StyledMenuButton = styled.button`
   svg {
     margin-top: 2px;
   }
-`;
+`
 
 const StyledMenu = styled.div`
   margin-left: 0.5rem;
@@ -49,16 +49,13 @@ const StyledMenu = styled.div`
   position: relative;
   border: none;
   text-align: left;
-`;
+`
 
 const MenuFlyout = styled.span`
   min-width: 9.125rem;
   background-color: ${({ theme }) => theme.bg3};
-  box-shadow:
-    0px 0px 1px rgba(0, 0, 0, 0.01),
-    0px 4px 8px rgba(0, 0, 0, 0.04),
-    0px 16px 24px rgba(0, 0, 0, 0.04),
-    0px 24px 32px rgba(0, 0, 0, 0.01);
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04),
+    0px 16px 24px rgba(0, 0, 0, 0.04), 0px 24px 32px rgba(0, 0, 0, 0.01);
   border-radius: 12px;
   padding: 0.5rem;
   display: flex;
@@ -72,7 +69,7 @@ const MenuFlyout = styled.span`
   ${({ theme }) => theme.mediaWidth.upToMedium`
     top: -17.25rem;
   `};
-`;
+`
 
 const MenuItem = styled(Link)`
   flex: 1;
@@ -86,13 +83,13 @@ const MenuItem = styled(Link)`
   > svg {
     margin-right: 8px;
   }
-`;
+`
 
 export default function Menu() {
-  const node = useRef<HTMLDivElement>(null);
-  const open = useModalOpen(ApplicationModal.MENU);
-  const toggle = useToggleModal(ApplicationModal.MENU);
-  useOnClickOutside(node, open ? toggle : undefined);
+  const node = useRef<HTMLDivElement>(null)
+  const open = useModalOpen(ApplicationModal.MENU)
+  const toggle = useToggleModal(ApplicationModal.MENU)
+  useOnClickOutside(node, open ? toggle : undefined)
 
   return (
     // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/30451
@@ -162,5 +159,5 @@ export default function Menu() {
         </MenuFlyout>
       )}
     </StyledMenu>
-  );
+  )
 }

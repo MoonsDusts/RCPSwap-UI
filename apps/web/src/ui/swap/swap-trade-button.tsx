@@ -14,6 +14,7 @@ import {
   useAccount,
   useContractWrite,
   usePrepareContractWrite,
+  waitForTransaction,
 } from "@rcpswap/wagmi"
 import { ROUTE_PROCESSOR_3_ADDRESS } from "rcpswap/config"
 import { Amount, tryParseAmount } from "rcpswap/currency"

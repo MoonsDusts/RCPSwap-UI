@@ -27,7 +27,7 @@ export default function SwapTradeConfirmModal() {
     mutate: { setSwapAmount },
   } = useDerivedSwapState()
 
-  const { data: trade } = useSwapTrade()
+  const trade = useSwapTrade().data as UseTradeReturn
 
   const addTransaction = useAddTransaction()
   const addPopup = useAddPopup()

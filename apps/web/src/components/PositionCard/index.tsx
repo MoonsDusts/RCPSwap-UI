@@ -7,7 +7,7 @@ import styled from "styled-components"
 import { TYPE } from "../../theme"
 import { ButtonPrimary, ButtonEmpty } from "../Button"
 import { transparentize } from "polished"
-import { CardNoise } from "../earn/styled"
+import { CardNoise } from "../styled"
 
 import { useColor } from "@rcpswap/hooks"
 import Card, { GreyCard, LightCard } from "../Card"

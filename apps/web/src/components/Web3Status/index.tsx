@@ -9,7 +9,6 @@ import { getShortenAddress } from "@rcpswap/wagmi";
 
 import { useWalletModalToggle } from "../../state/application/hooks";
 import { useAllTransactions } from "@rcpswap/dexie";
-import { TransactionDetails } from "../../state/transactions/reducer";
 import { ButtonSecondary } from "../Button";
 
 import Identicon from "../Identicon";
@@ -118,11 +117,6 @@ const NetworkIcon = styled(FiActivity)`
   width: 16px;
   height: 16px;
 `;
-
-// we want the latest one to come first, so return negative if a is after b
-function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
-  return b.addedTime - a.addedTime;
-}
 
 // eslint-disable-next-line react/prop-types
 function StatusIcon({ connector }: { connector: Connector }) {

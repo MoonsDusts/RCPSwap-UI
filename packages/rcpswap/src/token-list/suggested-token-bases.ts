@@ -4,7 +4,6 @@ import {
   BRICK,
   DAI,
   MOON,
-  MOOND,
   USDC,
   USDT,
   WBTC,
