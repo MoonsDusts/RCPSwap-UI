@@ -1,61 +1,102 @@
-# RCPSwap Interface
+# Sushi Monorepo
 
-[![Lint](https://github.com/Uniswap/uniswap-interface/workflows/Lint/badge.svg)](https://github.com/Uniswap/uniswap-interface/actions?query=workflow%3ALint)
-[![Tests](https://github.com/Uniswap/uniswap-interface/workflows/Tests/badge.svg)](https://github.com/Uniswap/uniswap-interface/actions?query=workflow%3ATests)
-[![Styled With Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
+Sushi 2.0 🍣
 
-An open source interface for Uniswap -- a protocol for decentralized exchange of Ethereum tokens.
+## Getting Started
 
-- Website: [uniswap.org](https://uniswap.org/)
-- Interface: [app.uniswap.org](https://app.uniswap.org)
-- Docs: [uniswap.org/docs/](https://uniswap.org/docs/)
-- Twitter: [@UniswapProtocol](https://twitter.com/UniswapProtocol)
-- Reddit: [/r/Uniswap](https://www.reddit.com/r/Uniswap/)
-- Email: [contact@uniswap.org](mailto:contact@uniswap.org)
-- Discord: [Uniswap](https://discord.gg/FCfyBSbCU5)
-- Whitepaper: [Link](https://hackmd.io/C-DvwDSfSxuh-Gd4WKE_ig)
+https://pnpm.io/installation
 
-## Accessing the RCPSwap Interface
+### Install
 
-To access the RCPSwap Interface, use an IPFS gateway link from the
-[latest release](https://github.com/Uniswap/uniswap-interface/releases/latest), 
-or visit [app.uniswap.org](https://app.uniswap.org).
+`pnpm install`
 
-## Listing a token
 
-Please see the
-[@venomswap/default-token-list](https://github.com/uniswap/default-token-list) 
-repository.
+### Dev
 
-## Development
+`pnpm exec turbo run dev --filter=evm`
 
-### Install Dependencies
+#### Vercel APIs
 
-```bash
-yarn
-```
+These need to be run from their own folder at the moment in development.
 
-### Run
+`pnpm exec vercel dev`
 
-```bash
-yarn start
-```
+### Build
 
-### Configuring the environment (optional)
+`pnpm run build`
 
-To have the interface default to a different network when a wallet is not connected:
+#### Single Repository
 
-1. Make a copy of `.env` named `.env.local`
-2. Change `REACT_APP_NETWORK_ID` to `"{YOUR_NETWORK_ID}"`
-3. Change `REACT_APP_NETWORK_URL` to e.g. `"https://{YOUR_NETWORK_ID}.infura.io/v3/{YOUR_INFURA_KEY}"` 
+`pnpm exec turbo run build --filter=api/app/package/protocol`
 
-Note that the interface only works on testnets where both 
-[Uniswap V2](https://uniswap.org/docs/v2/smart-contracts/factory/) and 
-[multicall](https://github.com/makerdao/multicall) are deployed.
-The interface will not work on other networks.
+### Test
 
-## Contributions
+`pnpm run test`
 
-**Please open all pull requests against the `master` branch.** 
-CI checks will run against all PRs.
+#### Single Repository
 
+`pnpm exec turbo run test --filter=api/app/package/protocol`
+
+### Clean
+
+`pnpm run clean`
+
+#### Single Repository
+
+`pnpm exec turbo run clean --filter=api/app/package/protocol`
+
+## APIs
+
+...
+
+### Creating a new API
+
+`git checkout -b feature/example-api`
+
+## Apps
+
+...
+
+### Creating a new app
+
+`git checkout -b feature/example-app`
+
+<!-- `pnpm exec @sushiswap/cli create-app example-app` -->
+
+## Config
+
+...
+
+### Creating a new config
+
+`git checkout -b feature/example-config`
+
+## Packages
+
+...
+
+### Creating a new package
+
+`git checkout -b feature/example-package`
+
+## Protocols
+
+...
+
+### Creating a new protocol
+
+`git checkout -b feature/example-protocol`
+
+## Subgraphs
+
+...
+
+### Creating a new subgraph
+
+`git checkout -b feature/example-subgraph`
+
+## Disclaimer
+
+_These smart contracts and code are being provided as is. No guarantee, representation or warranty is being made, express or implied, as to the safety or correctness of the user interface or the smart contracts and code. There can be no assurance they will work as intended, and users may experience delays, failures, errors, omissions or loss of transmitted information. In addition, using these smart contracts and code should be conducted in accordance with applicable law. Nothing in this repo should be construed as investment advice or legal advice for any particular facts or circumstances and is not meant to replace competent counsel. It is strongly advised for you to contact a reputable attorney in your jurisdiction for any questions or concerns with respect thereto. SushiSwap is not liable for any use of the foregoing and users should proceed with caution and use at their own risk._
+
+_Any stated APY (the 'Rate') is purely informational based on publicly available blockchain data, and is a forward-looking projection based on our good faith belief of how to reasonably project results over the relevant period, but such belief is subject to numerous assumptions, risks and uncertainties (including smart contract security risks and third-party actions) which could result in a materially different (lower or higher) token-denominated Rates. The Rate is not a promise, guarantee or undertaking on the part of any person or group of persons, but depends entirely on the results of operation of smart contracts and other autonomous systems (including third-party systems) and how third parties interact with those systems after the time of your deposit or other interactions. Even if the Rate is achieved as projected, you may still suffer a financial loss in fiat-denominated terms if the fiat-denominated value of the relevant tokens (your deposit and any tokens allocated or distributed to you pursuant to the Rate) declines during the deposit period._
