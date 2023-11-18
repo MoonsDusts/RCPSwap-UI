@@ -37,7 +37,7 @@ export default function CurrencySearchModal({
   showCommonBases = false,
 }: CurrencySearchModalProps) {
   const [modalView, setModalView] = useState<CurrencyModalView>(
-    CurrencyModalView.manage
+    CurrencyModalView.search
   )
   const lastOpen = useLast(isOpen)
 

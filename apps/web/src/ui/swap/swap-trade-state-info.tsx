@@ -19,6 +19,7 @@ import { Native } from "rcpswap/currency"
 import { useContext, useState } from "react"
 import { Text } from "rebass"
 import { ThemeContext } from "styled-components"
+import QuestionHelper from "@/components/QuestionHelper"
 
 export default function SwapTradeStateInfo() {
   const theme = useContext(ThemeContext)
@@ -46,7 +47,10 @@ export default function SwapTradeStateInfo() {
         {swapMode === 1 && (
           <RowBetween>
             <ToggleStyledText disabled={!ultraMode}>
-              Ultra Saving{" "}
+              Ultra Saving
+              <QuestionHelper
+                text={`Ultra Saving allows more efficient trades and more savings, but requires more time to calculate the route.`}
+              />
             </ToggleStyledText>
             <Toggle
               id="toggle-expert-mode-button"

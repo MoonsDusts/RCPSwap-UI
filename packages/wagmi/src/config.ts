@@ -1,10 +1,10 @@
-import { allChains, allProviders } from '@rcpswap/wagmi-config'
-import { configureChains, createConfig } from 'wagmi'
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { LedgerConnector } from 'wagmi/connectors/ledger'
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { allChains, allProviders } from "@rcpswap/wagmi-config"
+import { configureChains, createConfig } from "wagmi"
+import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
+import { InjectedConnector } from "wagmi/connectors/injected"
+import { LedgerConnector } from "wagmi/connectors/ledger"
+import { MetaMaskConnector } from "wagmi/connectors/metaMask"
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 
 export const createProductionConfig = () => {
   const { chains, publicClient } = configureChains(allChains, allProviders, {
@@ -18,6 +18,7 @@ export const createProductionConfig = () => {
       new InjectedConnector({
         chains,
         options: {
+          name: "Injected",
           shimDisconnect: true,
         },
       }),
@@ -35,12 +36,12 @@ export const createProductionConfig = () => {
         chains,
         options: {
           showQrModal: true,
-          projectId: '187b0394dbf3b20ce7762592560eafd2',
+          projectId: "6ad02f9ab9bf39893167c8d7e962f5cf",
           metadata: {
-            name: 'RCPSwap',
-            description: 'Reddit Community Points Swap',
-            url: 'https://www.rcpswap.com',
-            icons: ['https://www.rcpswap.com/icon.png'],
+            name: "RCPSwap",
+            description: "Reddit Community Points Swap",
+            url: "https://www.rcpswap.com",
+            icons: ["https://www.rcpswap.com/icon.png"],
           },
         },
       }),
@@ -48,11 +49,10 @@ export const createProductionConfig = () => {
         // TODO: Flesh out coinbase wallet connect options?
         chains,
         options: {
-          appName: 'RCPSwap',
-          appLogoUrl:
-            'https://www.rcpswap.com/icon.png',
+          appName: "RCPSwap",
+          appLogoUrl: "https://www.rcpswap.com/icon.png",
         },
-      })
+      }),
     ],
   })
 }

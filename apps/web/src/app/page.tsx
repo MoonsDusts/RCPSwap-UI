@@ -1,6 +1,8 @@
-import { redirect } from "next/navigation";
-const Home = () => {
-  redirect("/swap");
-};
+"use client"
 
-export default Home;
+import { redirect } from "next/navigation"
+const Home = () => {
+  redirect("/swap")
+}
+
+export default Home

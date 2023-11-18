@@ -106,7 +106,7 @@ export default function Modal({
   children,
 }: ModalProps) {
   const fadeTransition = useTransition(isOpen, {
-    config: { duration: 200 },
+    config: { duration: 50 },
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },

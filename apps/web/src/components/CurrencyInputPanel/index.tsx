@@ -88,7 +88,7 @@ const Aligner = styled.span`
 const StyledDropDown = styled(FiChevronDown)<{ selected: boolean }>`
   margin: 0 0.25rem 0 0.5rem;
   height: 35%;
-  stroke: ${({ theme }) => theme.text1};
+  stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
 
   path {
     stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};

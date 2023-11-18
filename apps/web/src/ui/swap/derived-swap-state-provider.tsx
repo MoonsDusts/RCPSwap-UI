@@ -11,7 +11,14 @@ import {
   useState,
 } from "react"
 import { ChainId } from "rcpswap/chain"
-import { Amount, Price, Token, Type, tryParseAmount } from "rcpswap/currency"
+import {
+  Amount,
+  Native,
+  Price,
+  Token,
+  Type,
+  tryParseAmount,
+} from "rcpswap/currency"
 import { Percent, ZERO } from "rcpswap/math"
 import { LiquidityProviders } from "@rcpswap/router"
 import { useQuery } from "@tanstack/react-query"
@@ -56,9 +63,11 @@ const DerivedSwapStateProvider: FC<DerivedSwapStateProviderProps> = ({
 
   const [chainId0, setChainId0] = useState<ChainId>(ChainId.ARBITRUM_NOVA)
   const [chainId1, setChainId1] = useState<ChainId>(ChainId.ARBITRUM_NOVA)
-  const [swapMode, setSwapMode] = useState(0)
+  const [swapMode, setSwapMode] = useState(1)
   const [swapAmount, setSwapAmount] = useState<string | undefined>()
-  const [token0, setToken0] = useState<Type | undefined>()
+  const [token0, setToken0] = useState<Type | undefined>(
+    Native.onChain(ChainId.ARBITRUM_NOVA)
+  )
   const [token1, setToken1] = useState<Type | undefined>()
   const [recipient, setRecipient] = useState<string | undefined>()
   const [ultraMode, setUltraMode] = useState(false)

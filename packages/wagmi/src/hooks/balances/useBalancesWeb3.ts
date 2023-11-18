@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import { ChainId } from 'rcpswap/chain'
-import { Amount, Native, Token, Type } from 'rcpswap/currency'
-import { Address, isAddress, zeroAddress } from 'viem'
+import { useQuery } from "@tanstack/react-query"
+import { useEffect } from "react"
+import { ChainId } from "rcpswap/chain"
+import { Amount, Native, Token, Type } from "rcpswap/currency"
+import { Address, isAddress, zeroAddress } from "viem"
 
-import { erc20ABI, fetchBalance, readContracts } from '@wagmi/core'
+import { erc20ABI, fetchBalance, readContracts } from "@wagmi/core"
 
 interface UseBalanceParams {
   chainId: ChainId | undefined
@@ -17,12 +17,13 @@ export const queryFnUseBalances = async ({
   chainId,
   currencies,
   account,
-}: Omit<UseBalanceParams, 'enabled'>) => {
+}: Omit<UseBalanceParams, "enabled">) => {
   if (!account || !chainId || !currencies) return null
+  console.log(currencies)
   const native = await fetchBalance({
     address: account,
     chainId,
-    formatUnits: 'wei',
+    formatUnits: "wei",
   })
   const [validatedTokens, validatedTokenAddresses] = currencies.reduce<
     [Token[], Address[]]
@@ -35,7 +36,7 @@ export const queryFnUseBalances = async ({
 
       return acc
     },
-    [[], []],
+    [[], []]
   )
 
   const data = await readContracts({
@@ -45,18 +46,18 @@ export const queryFnUseBalances = async ({
           chainId,
           address: token,
           abi: erc20ABI,
-          functionName: 'balanceOf',
+          functionName: "balanceOf",
           args: [account],
-        }) as const,
+        } as const)
     ),
   })
 
   const _data = data.reduce<Record<string, Amount<Type>>>((acc, _cur, i) => {
     const amount = data[i].result
-    if (typeof amount === 'bigint') {
+    if (typeof amount === "bigint") {
       acc[validatedTokens[i].address] = Amount.fromRawAmount(
         validatedTokens[i],
-        amount,
+        amount
       )
     }
     return acc
@@ -64,7 +65,7 @@ export const queryFnUseBalances = async ({
 
   _data[zeroAddress] = Amount.fromRawAmount(
     Native.onChain(chainId),
-    native.value,
+    native.value
   )
 
   return _data
@@ -79,13 +80,13 @@ export const useBalancesWeb3 = ({
   useEffect(() => {
     if (currencies && currencies.length > 100) {
       throw new Error(
-        'useBalancesWeb3: currencies length > 100, this will hurt performance and cause rate limits',
+        "useBalancesWeb3: currencies length > 100, this will hurt performance and cause rate limits"
       )
     }
   }, [currencies])
 
   return useQuery({
-    queryKey: ['useBalancesWeb3', { chainId, currencies, account }],
+    queryKey: ["useBalancesWeb3", { chainId, currencies, account }],
     queryFn: () => queryFnUseBalances({ chainId, currencies, account }),
     refetchInterval: 60000,
     cacheTime: 60000,

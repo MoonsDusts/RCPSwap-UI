@@ -10,10 +10,6 @@ import Polling from "@/components/Header/Polling"
 import styled from "styled-components"
 import Popups from "@/components/Popups"
 
-export const metadata: Metadata = {
-  title: "RCPSwap | Reddit Community Points Swap",
-}
-
 const BodyWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -61,6 +57,7 @@ export default function RootLayout({
         sizes="16x16"
         href="/favicon-16x16.png?v=1"
       />
+      <title>RCPSwap | Reddit Community Points Swap</title>
       <link rel="manifest" href="/site.webmanifest?v=1" />
       <link rel="mask-icon" href="/safari-pinned-tab.svg?v=1" color="#363636" />
       <link rel="shortcut icon" href="/favicon.ico?v=1" />

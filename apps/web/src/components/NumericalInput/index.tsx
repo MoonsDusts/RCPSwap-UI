@@ -41,6 +41,10 @@ const StyledInput = styled.input<{
   &::placeholder {
     color: ${({ theme }) => theme.text4};
   }
+
+  &:disabled {
+    color: ${({ theme }) => theme.text1};
+  }
 `
 
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`) // match escaped "." characters via in a non-capturing group
