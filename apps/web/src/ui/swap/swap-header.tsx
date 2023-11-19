@@ -28,7 +28,7 @@ const SwitchTitle = styled.div`
 `
 
 const FUSION_TEXT =
-  "xFusion is DEX Aggregator Algorithm that thrives to calculate the most efficient route possible for the trade you entered - giving you the best trade possible."
+  "xFusion is a DEX Aggregator Algorithm crafted to calculate the most efficient route for your entered trade, optimizing results and saving the most money, particularly advantageous for larger trades or higher volumes."
 const SWAP_TEXT =
   "When using the ‘Swap’ function, you’re directly interacting only with RCPswapV2 pools, Unlike xFusion where you get deeper liquidity by accessing multiple DEXs and Pools."
 
