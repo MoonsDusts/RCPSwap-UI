@@ -49,7 +49,7 @@ export default function SwapTradeStateInfo() {
             <ToggleStyledText disabled={!ultraMode}>
               Ultra Saving
               <QuestionHelper
-                text={`Ultra Saving allows more efficient trades and more savings, but requires more time to calculate the route.`}
+                text={`Ultra Saving enhances trade efficiency and increases savings, albeit with a trade-off of requiring additional time for route calculations.`}
               />
             </ToggleStyledText>
             <Toggle
